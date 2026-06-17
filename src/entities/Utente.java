@@ -54,7 +54,15 @@ public class Utente {
 	}
 	
 	public boolean modificaPassword(String oldPassword, String newPassword) {
-		
+		if(this.getPassword().equals(oldPassword))
+		{
+			password = newPassword;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	public ArrayList <ElementoMultimediale> getElementiPubblicati(){
