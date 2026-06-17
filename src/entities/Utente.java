@@ -3,7 +3,8 @@ package entities;
 import java.util.ArrayList;
 
 public class Utente {
-
+	
+	private int idUtente;
 	private String Matricola;
 	private String nome;
 	private String cognome;
@@ -13,15 +14,21 @@ public class Utente {
 	private ArrayList <ElementoMultimediale> elementiPubblicati;
 	private ArrayList <Playlist> miePlaylist;
 	
-	public Utente(String matricola, String nome, String cognome, String username, String email, String password) {
-		Matricola = matricola;
+	public Utente(int idUtente, String matricola, String nome, String cognome, String username, String email, String password) {
+		this.idUtente = idUtente;
+		this.Matricola = matricola;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 	}
-
+	
+	
+	public int getIdUtente() {
+		return idUtente;
+	}
+	
 	public String getMatricola() {
 		return Matricola;
 	}
@@ -51,10 +58,10 @@ public class Utente {
 	}
 	
 	public ArrayList <ElementoMultimediale> getElementiPubblicati(){
-		
+		return this.elementiPubblicati;
 	}
 	
-	public ArrayList <PlayList> getMiePlaylist(){
-		
+	public ArrayList <Playlist> getMiePlaylist(){
+		return this.miePlaylist;
 	}
 }
