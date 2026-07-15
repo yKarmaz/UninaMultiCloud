@@ -2,6 +2,8 @@ package entities;
 
 import java.util.ArrayList;
 
+import exceptions.ChiaveGenerataNonValidaException;
+
 public class Utente {
 	
 	private int idUtente;
@@ -15,7 +17,8 @@ public class Utente {
 	private ArrayList <Playlist> miePlaylist;
 	
 	public Utente(int idUtente, String matricola, String nome, String cognome, String username, String email, String password) {
-		this.idUtente = idUtente;
+		if(idUtente < 0) throw new ChiaveGenerataNonValidaException("ID utente non valido");
+		else this.idUtente = idUtente;
 		this.Matricola = matricola;
 		this.nome = nome;
 		this.cognome = cognome;
@@ -72,4 +75,34 @@ public class Utente {
 	public ArrayList <Playlist> getMiePlaylist(){
 		return this.miePlaylist;
 	}
+
+
+	public void setMatricola(String matricola) {
+		Matricola = matricola;
+	}
+
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
+	}
+
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	
+	
+	
+	
 }

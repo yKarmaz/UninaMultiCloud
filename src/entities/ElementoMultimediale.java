@@ -4,36 +4,36 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import exceptions.ChiaveGenerataNonValidaException;
+
 public class ElementoMultimediale {
 	private int idElemento;
 	private String descrizione;
 	private String titolo;
-	private Duration durata;
+	private int durata; //in secondi
 	private LocalDate dataCreazione;
 	private String immagineCopertina;
 	private int numVisualizzazioni;
 	private Utente proprietario;
+	private String tipoElemento;
+	private String risoluzione;
+	private Integer bitRate;
 	private ArrayList<Utente> listaFruitori = new ArrayList<Utente>();
-	public ElementoMultimediale(int idElemento, String titolo, Duration durata, LocalDate dataCreazione, String immagineCopertina, Utente proprietario ){
-		this.idElemento = idElemento;
-		descrizione = "";
-		this.titolo = titolo;
-		this.durata = durata;
-		this.dataCreazione = dataCreazione;
-		this.immagineCopertina = immagineCopertina;
-		numVisualizzazioni = 0;
-		this.proprietario = proprietario;
-	}
+
 	
-	public ElementoMultimediale(int idElemento, String descrizione, String titolo, Duration durata, LocalDate dataCreazione, String immagineCopertina, Utente proprietario) {
+	public ElementoMultimediale(int idElemento, String descrizione, String titolo, int durata, LocalDate dataCreazione, String immagineCopertina, Utente proprietario, String tipoElemento, String risoluzione, Integer bitRate) {
+		if(idElemento < 0) throw new ChiaveGenerataNonValidaException("ID elemento non valido");
 		this.idElemento = idElemento;
 		this.descrizione = descrizione;
 		this.titolo = titolo;
 		this.durata = durata;
-		this.dataCreazione = dataCreazione;
+		this.dataCreazione = LocalDate.now();
 		this.immagineCopertina = immagineCopertina;
 		numVisualizzazioni = 0;
 		this.proprietario = proprietario;
+		this.tipoElemento = tipoElemento;
+	    this.risoluzione = risoluzione;
+	    this.bitRate = bitRate;
 	}
 
 	public String getDescrizione() {
@@ -52,11 +52,11 @@ public class ElementoMultimediale {
 		this.titolo = titolo;
 	}
 
-	public Duration getDurata() {
+	public int getDurata() {
 		return durata;
 	}
 
-	public void setDurata(Duration durata) {
+	public void setDurata(int durata) {
 		this.durata = durata;
 	}
 
@@ -108,6 +108,34 @@ public class ElementoMultimediale {
 	public void removeFruitore(Utente u)
 	{
 		 listaFruitori.remove(u);
+	}
+
+	public String getTipoElemento() {
+		return tipoElemento;
+	}
+
+	public void setTipoElemento(String tipoElemento) {
+		this.tipoElemento = tipoElemento;
+	}
+
+	public String getRisoluzione() {
+		return risoluzione;
+	}
+
+	public void setRisoluzione(String risoluzione) {
+		this.risoluzione = risoluzione;
+	}
+
+	public Integer getBitRate() {
+		return bitRate;
+	}
+
+	public void setBitRate(Integer bitRate) {
+		this.bitRate = bitRate;
+	}
+
+	public int getIdElemento() {
+		return idElemento;
 	}
 	
 	
