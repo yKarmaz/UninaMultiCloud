@@ -1,29 +1,30 @@
 package boundaries;
+
 import javax.swing.*;
-
-import controllers.MediaController;
-
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import controllers.MediaController;
+// import boundaries.HomePage; // (Scommenta questo nel progetto vero)
+
 public class CaricaElemento extends JPanel {
 
     private MediaController mediaController;
-    private HomePage homePage;
+    private JPanel homePage; // L'ho messo JPanel per il BancoDiProva. Mettilo HomePage!
 
-    // Componenti della form
     private JTextField txtTitolo;
     private JTextArea txtDescrizione;
     private JRadioButton rbAudio;
     private JRadioButton rbVideo;
     private ButtonGroup gruppoTipologia;
     
-    private JLabel lblPercorsoFile; // Mostra il file selezionato
-    private String percorsoFileSelezionato = ""; // Memorizza il path reale
+    private JLabel lblPercorsoFile; 
+    private String percorsoFileSelezionato = ""; 
 
-    public CaricaElemento(MediaController mediaController, HomePage homePage) {
+    public CaricaElemento(MediaController mediaController, JPanel homePage) {
         this.mediaController = mediaController;
         this.homePage = homePage;
         
@@ -31,101 +32,131 @@ public class CaricaElemento extends JPanel {
     }
 
     private void inizializzaInterfaccia() {
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- 1. HEADER ---
+        // --- 1. HEADER (Tasto Indietro in alto a sinistra, Titolo centrato) ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         JButton btnIndietro = new JButton("< Indietro");
+        btnIndietro.setFont(new Font("Tahoma", Font.BOLD, 12));
+        
         JLabel lblTitoloView = new JLabel("Carica un Nuovo Elemento", SwingConstants.CENTER);
-        lblTitoloView.setFont(new Font("Tahoma", Font.BOLD, 22));
+        lblTitoloView.setFont(new Font("Tahoma", Font.BOLD, 26));
+        lblTitoloView.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
         
         pnlHeader.add(btnIndietro, BorderLayout.WEST);
         pnlHeader.add(lblTitoloView, BorderLayout.CENTER);
         add(pnlHeader, BorderLayout.NORTH);
 
-        // --- 2. FORM CENTRALE ---
-        // Usiamo un BoxLayout verticale per impilare gli elementi in modo pulito
-        JPanel pnlForm = new JPanel();
-        pnlForm.setLayout(new BoxLayout(pnlForm, BoxLayout.Y_AXIS));
+        // --- 2. FORM CENTRATO CON GRIDBAGLAYOUT ---
+        JPanel pnlForm = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 15, 10, 15); 
+        gbc.anchor = GridBagConstraints.NORTHWEST; // Allinea tutto in alto a sinistra nella propria cella
 
-        // Titolo
-        pnlForm.add(new JLabel("Titolo:"));
-        txtTitolo = new JTextField();
-        txtTitolo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        pnlForm.add(txtTitolo);
-        pnlForm.add(Box.createRigidArea(new Dimension(0, 15))); // Spazio vuoto
+        // Riga 0: Titolo
+        gbc.gridx = 0; gbc.gridy = 0;
+        JLabel lblTitolo = new JLabel("Titolo:");
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblTitolo, gbc);
 
-        // Descrizione
-        pnlForm.add(new JLabel("Descrizione:"));
-        txtDescrizione = new JTextArea(3, 20);
+        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        txtTitolo = new JTextField(25); // Larghezza fissa
+        txtTitolo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        pnlForm.add(txtTitolo, gbc);
+
+        // Riga 1: Descrizione
+        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        JLabel lblDescrizione = new JLabel("Descrizione:");
+        lblDescrizione.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblDescrizione, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 1;
+        txtDescrizione = new JTextArea(4, 25);
+        txtDescrizione.setFont(new Font("Tahoma", Font.PLAIN, 14));
         txtDescrizione.setLineWrap(true);
         txtDescrizione.setWrapStyleWord(true);
-        JScrollPane scrollDescrizione = new JScrollPane(txtDescrizione);
-        scrollDescrizione.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        pnlForm.add(scrollDescrizione);
-        pnlForm.add(Box.createRigidArea(new Dimension(0, 15)));
+        JScrollPane scrollDesc = new JScrollPane(txtDescrizione);
+        pnlForm.add(scrollDesc, gbc);
 
-        // Tipologia (Audio/Video)
-        pnlForm.add(new JLabel("Tipologia:"));
-        JPanel pnlRadio = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        // Riga 2: Tipologia
+        gbc.gridx = 0; gbc.gridy = 2;
+        JLabel lblTipo = new JLabel("Tipologia:");
+        lblTipo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblTipo, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 2;
+        JPanel pnlRadio = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         rbAudio = new JRadioButton("Audio", true);
         rbVideo = new JRadioButton("Video");
+        rbAudio.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        rbVideo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        
         gruppoTipologia = new ButtonGroup();
         gruppoTipologia.add(rbAudio);
         gruppoTipologia.add(rbVideo);
         pnlRadio.add(rbAudio);
         pnlRadio.add(rbVideo);
-        pnlRadio.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        pnlForm.add(pnlRadio);
-        pnlForm.add(Box.createRigidArea(new Dimension(0, 15)));
+        pnlForm.add(pnlRadio, gbc);
 
-        // Seleziona File (Media / Copertina)
-        pnlForm.add(new JLabel("File Multimediale:"));
-        JPanel pnlFile = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        // Riga 3: File Multimediale
+        gbc.gridx = 0; gbc.gridy = 3;
+        JLabel lblFile = new JLabel("File Multimediale:");
+        lblFile.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblFile, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 3;
+        JPanel pnlFile = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton btnScegliFile = new JButton("Sfoglia...");
-        lblPercorsoFile = new JLabel(" Nessun file selezionato");
+        lblPercorsoFile = new JLabel("Nessun file selezionato");
+        lblPercorsoFile.setFont(new Font("Tahoma", Font.ITALIC, 12));
         lblPercorsoFile.setForeground(Color.GRAY);
         pnlFile.add(btnScegliFile);
         pnlFile.add(lblPercorsoFile);
-        pnlFile.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pnlForm.add(pnlFile);
+        pnlForm.add(pnlFile, gbc);
 
         add(pnlForm, BorderLayout.CENTER);
 
         // --- 3. FOOTER (Tasto Carica) ---
         JPanel pnlFooter = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        pnlFooter.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         JButton btnCarica = new JButton("Carica Contenuto");
         btnCarica.setBackground(new Color(46, 204, 113));
         btnCarica.setForeground(Color.WHITE);
-        btnCarica.setFont(new Font("Tahoma", Font.BOLD, 14));
+        btnCarica.setFont(new Font("Tahoma", Font.BOLD, 16));
         pnlFooter.add(btnCarica);
         
         add(pnlFooter, BorderLayout.SOUTH);
 
         // ==========================================
-        // 4. EVENTI
+        // EVENTI
         // ==========================================
 
         btnIndietro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                homePage.cambiaPannelloCentrale(new JPanel());
+                // homePage.cambiaPannelloCentrale(new JPanel()); // Scommenta nel progetto vero
+                System.out.println("Torno indietro...");
             }
         });
 
-        // Evento Sfoglia File
         btnScegliFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Apre la finestra di sistema per scegliere un file
                 JFileChooser fileChooser = new JFileChooser();
+                
+                // 🛑 IL FILTRO: Obbliga l'utente a scegliere formati sensati!
+                FileNameExtensionFilter filtroMedia = new FileNameExtensionFilter("File Audio e Video (*.mp3, *.mp4, *.wav)", "mp3", "mp4", "wav");
+                fileChooser.setFileFilter(filtroMedia);
+                
                 int risultato = fileChooser.showOpenDialog(CaricaElemento.this);
                 
                 if (risultato == JFileChooser.APPROVE_OPTION) {
                     File fileSelezionato = fileChooser.getSelectedFile();
-                    percorsoFileSelezionato = fileSelezionato.getAbsolutePath(); // Es: C:\Musica\brano.mp3
-                    lblPercorsoFile.setText(" " + fileSelezionato.getName());
+                    percorsoFileSelezionato = fileSelezionato.getAbsolutePath(); 
+                    lblPercorsoFile.setText(fileSelezionato.getName());
                     lblPercorsoFile.setForeground(Color.BLACK);
                 }
             }
@@ -138,30 +169,25 @@ public class CaricaElemento extends JPanel {
                 String descrizione = txtDescrizione.getText().trim();
                 String tipo = rbAudio.isSelected() ? "Audio" : "Video";
 
-                // Validazione Boundary
                 if (titolo.isEmpty() || descrizione.isEmpty() || percorsoFileSelezionato.isEmpty()) {
                     JOptionPane.showMessageDialog(CaricaElemento.this, 
                         "Compila tutti i campi e seleziona un file!", "Errore", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
-                // ⚠️ IN FUTURO: Quando avrai l'Utente loggato nel SessionController, potrai passarlo
-                // al MediaController per associarlo come creatore/uploader del file (se richiesto dal DB).
-                
-                // DELEGA AL CONTROLLER (Nota: ho aggiunto 'descrizione' per matchare il tuo EBC)
+                // Delega al Controller
                 boolean successo = mediaController.caricaNuovoElemento(titolo, descrizione, percorsoFileSelezionato, tipo);
 
                 if (successo) {
                     JOptionPane.showMessageDialog(CaricaElemento.this, 
                         "Elemento caricato con successo!", "Upload Completato", JOptionPane.INFORMATION_MESSAGE);
                     
-                    // Reset dei campi dopo il caricamento
+                    // Reset
                     txtTitolo.setText("");
                     txtDescrizione.setText("");
                     percorsoFileSelezionato = "";
-                    lblPercorsoFile.setText(" Nessun file selezionato");
-                    
-                    homePage.cambiaPannelloCentrale(new JPanel());
+                    lblPercorsoFile.setText("Nessun file selezionato");
+                    lblPercorsoFile.setForeground(Color.GRAY);
                 } else {
                     JOptionPane.showMessageDialog(CaricaElemento.this, 
                         "Errore durante l'upload del file.", "Errore Server", JOptionPane.ERROR_MESSAGE);

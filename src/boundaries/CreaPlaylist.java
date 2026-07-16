@@ -1,27 +1,26 @@
-package boundaries;
+package boundaries; // Controlla che il package sia corretto per te
 
 import javax.swing.*;
-
-import controllers.*;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import controllers.PlaylistController;
+// import boundaries.HomePage; // (Scommenta questo quando unirai tutto)
+
 public class CreaPlaylist extends JPanel {
 
-    // Riferimenti indispensabili per non violare l'EBC
     private PlaylistController playlistController;
-    private HomePage homePage; // Ci serve per il tasto "Indietro"
+    private JPanel homePage; // L'ho messo JPanel per il BancoDiProva. Mettilo HomePage!
 
-    // Componenti visivi
     private JTextField txtNome;
     private JRadioButton rbPubblica;
     private JRadioButton rbPrivata;
     private JRadioButton rbCondivisa;
     private ButtonGroup gruppoTipologia;
 
-    public CreaPlaylist(PlaylistController playlistController, HomePage homePage) {
+    // Costruttore temporaneo per il BancoDiProva (Usa 'HomePage' nel progetto vero)
+    public CreaPlaylist(PlaylistController playlistController, JPanel homePage) {
         this.playlistController = playlistController;
         this.homePage = homePage;
         
@@ -29,31 +28,57 @@ public class CreaPlaylist extends JPanel {
     }
 
     private void inizializzaInterfaccia() {
-        // Layout pulito e "WindowBuilder Friendly"
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // --- 1. TITOLO (In alto) ---
+        // --- 1. TITOLO ---
         JLabel lblTitolo = new JLabel("Crea una Nuova Playlist", SwingConstants.CENTER);
-        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 22));
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
+        lblTitolo.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0)); // Spazio sotto il titolo
         add(lblTitolo, BorderLayout.NORTH);
 
-        // --- 2. FORM DI INSERIMENTO (Al centro) ---
-        JPanel pnlForm = new JPanel(new GridLayout(4, 1, 10, 10));
-        
-        pnlForm.add(new JLabel("Nome della Playlist:"));
-        txtNome = new JTextField();
-        pnlForm.add(txtNome);
+        // --- 2. FORM CENTRATO CON GRIDBAGLAYOUT (Perfetto per i Mock-up) ---
+        JPanel pnlForm = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); // Margini tra gli elementi (Sopra, Sinistra, Sotto, Destra)
+        gbc.anchor = GridBagConstraints.WEST; // Allinea tutto a sinistra della sua cella
 
-        pnlForm.add(new JLabel("Seleziona la Tipologia:"));
+        // Riga 0 - Colonna 0: Etichetta Nome [cite: 9]
+        gbc.gridx = 0; 
+        gbc.gridy = 0;
+        JLabel lblNome = new JLabel("Nome della Playlist:");
+        lblNome.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblNome, gbc);
+
+        // Riga 0 - Colonna 1: Campo di testo Nome
+        gbc.gridx = 1; 
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Fagli occupare lo spazio in orizzontale
+        txtNome = new JTextField(20);
+        txtNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        pnlForm.add(txtNome, gbc);
+
+        // Riga 1 - Colonna 0: Etichetta Tipologia [cite: 10]
+        gbc.gridx = 0; 
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        JLabel lblTipo = new JLabel("Seleziona la Tipologia:");
+        lblTipo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblTipo, gbc);
+
+        // Riga 1 - Colonna 1: Bottoni Radio [cite: 11, 12, 13]
+        gbc.gridx = 1; 
+        gbc.gridy = 1;
+        JPanel pnlRadio = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         
-        // Pannello per i radio button affiancati
-        JPanel pnlRadio = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rbPubblica = new JRadioButton("Pubblica");
-        rbPrivata = new JRadioButton("Privata", true); // Selezionato di default per evitare errori
+        rbPrivata = new JRadioButton("Privata", true);
         rbCondivisa = new JRadioButton("Condivisa");
         
-        // Il ButtonGroup impedisce all'utente di selezionarne due contemporaneamente
+        rbPubblica.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        rbPrivata.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        rbCondivisa.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        
         gruppoTipologia = new ButtonGroup();
         gruppoTipologia.add(rbPubblica);
         gruppoTipologia.add(rbPrivata);
@@ -62,16 +87,20 @@ public class CreaPlaylist extends JPanel {
         pnlRadio.add(rbPubblica);
         pnlRadio.add(rbPrivata);
         pnlRadio.add(rbCondivisa);
-        
-        pnlForm.add(pnlRadio);
+        pnlForm.add(pnlRadio, gbc);
+
+        // Aggiungo il form al centro
         add(pnlForm, BorderLayout.CENTER);
 
         // --- 3. BOTTONI DI AZIONE (In basso) ---
-        JPanel pnlBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        JPanel pnlBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         
         JButton btnIndietro = new JButton("< Indietro");
+        btnIndietro.setFont(new Font("Tahoma", Font.BOLD, 14));
+        
         JButton btnCrea = new JButton("Crea Playlist");
-        btnCrea.setBackground(new Color(46, 204, 113)); // Verde per far capire che è un'azione positiva
+        btnCrea.setFont(new Font("Tahoma", Font.BOLD, 14));
+        btnCrea.setBackground(new Color(46, 204, 113));
         btnCrea.setForeground(Color.WHITE);
 
         pnlBottoni.add(btnIndietro);
@@ -79,44 +108,36 @@ public class CreaPlaylist extends JPanel {
         add(pnlBottoni, BorderLayout.SOUTH);
 
         // ==========================================
-        // 4. EVENTI (Il collegamento tra Vista e Logica)
+        // EVENTI
         // ==========================================
-
-        // Evento Tasto Indietro
         btnIndietro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Svuotiamo il centro della HomePage mettendo un pannello vuoto
-                homePage.cambiaPannelloCentrale(new JPanel()); 
+                // homePage.cambiaPannelloCentrale(new JPanel()); // Scommenta nel progetto reale
+                System.out.println("Torno indietro (Simulazione)");
             }
         });
 
-        // Evento Tasto Crea
         btnCrea.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // A. La Boundary raccoglie i dati digitati (lavoro da Boundary)
                 String nome = txtNome.getText().trim();
-                String tipologia = "Privata"; // Default
+                String tipologia = "Privata"; 
                 if (rbPubblica.isSelected()) tipologia = "Pubblica";
                 if (rbCondivisa.isSelected()) tipologia = "Condivisa";
 
-                // B. Validazione visiva di base (NON chiamare il DB se il campo è vuoto)
                 if (nome.isEmpty()) {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
                         "Errore: Inserisci un nome per la playlist!", "Attenzione", JOptionPane.WARNING_MESSAGE);
-                    return; // Blocca l'esecuzione
+                    return;
                 }
 
-                // C. DELEGA AL CONTROLLER (EBC Puro)
                 boolean successo = playlistController.creaNuovaPlaylist(nome, tipologia);
 
-                // D. Reazione della GUI in base alla risposta del Controller
                 if (successo) {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
                         "Playlist creata con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                    txtNome.setText(""); // Pulisce il campo
-                    homePage.cambiaPannelloCentrale(new JPanel()); // Torna alla home
+                    txtNome.setText("");
                 } else {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
                         "Errore interno. Impossibile creare la playlist.", "Errore", JOptionPane.ERROR_MESSAGE);

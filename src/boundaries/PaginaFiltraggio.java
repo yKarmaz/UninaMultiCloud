@@ -1,113 +1,172 @@
 package boundaries;
 
 import javax.swing.*;
-
-import controllers.MediaController;
-import controllers.PlaylistController;
-
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import controllers.MediaController;
+import controllers.PlaylistController;
+// import boundaries.HomePage; // ⚠️ IN FUTURO: Scommentare quando unisci col compagno
 
 public class PaginaFiltraggio extends JPanel {
 
     private MediaController mediaController;
     private PlaylistController playlistController;
-    private HomePage homePage;
+    private JPanel homePage; // ⚠️ IN FUTURO: Cambiare in HomePage
 
-    // Componenti richiesti dal tuo mock-up
     private JTextField txtTitolo;
     private JComboBox<String> comboTipo;
-    
-    public PaginaFiltraggio(MediaController mediaCtrl, PlaylistController playCtrl, HomePage home) {
+    private JTable tabellaElementi;
+    private DefaultTableModel modelloTabella;
+
+    public PaginaFiltraggio(MediaController mediaCtrl, PlaylistController playCtrl, JPanel home) {
         this.mediaController = mediaCtrl;
         this.playlistController = playCtrl;
         this.homePage = home;
         
         inizializzaInterfaccia();
+        
+        // Simulo una ricerca vuota all'avvio per riempire la tabella
+        eseguiRicerca("", "Tutti"); 
     }
 
     private void inizializzaInterfaccia() {
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
-
-        // --- 1. HEADER (HomeButton) ---
-        JPanel pnlHeader = new JPanel(new BorderLayout());
-        JButton btnHome = new JButton("< Torna alla Home"); // Il tuo HomeButton
-        JLabel lblTitoloView = new JLabel("Ricerca Avanzata Elementi", SwingConstants.CENTER);
-        lblTitoloView.setFont(new Font("Tahoma", Font.BOLD, 22));
-        
-        pnlHeader.add(btnHome, BorderLayout.WEST);
-        pnlHeader.add(lblTitoloView, BorderLayout.CENTER);
-        add(pnlHeader, BorderLayout.NORTH);
-
-        // --- 2. FORM DI FILTRAGGIO (Centro) ---
-        JPanel pnlForm = new JPanel(new GridLayout(4, 1, 10, 15));
-        
-        // TitoloText e TitoloTextField
-        pnlForm.add(new JLabel("Inserisci il Titolo da cercare:"));
-        txtTitolo = new JTextField();
-        pnlForm.add(txtTitolo);
-
-        // ComboTipo
-        pnlForm.add(new JLabel("Seleziona la Tipologia:"));
-        String[] tipiContenuto = {"Tutti", "Audio", "Video"};
-        comboTipo = new JComboBox<>(tipiContenuto);
-        pnlForm.add(comboTipo);
-
-        add(pnlForm, BorderLayout.CENTER);
-
-        // --- 3. BOTTONI DI AZIONE (FiltraButton e PlaylistButton) ---
-        JPanel pnlBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
-        
-        JButton btnFiltra = new JButton("Applica Filtro e Cerca");
-        btnFiltra.setBackground(new Color(52, 152, 219));
-        btnFiltra.setForeground(Color.WHITE);
-        btnFiltra.setFont(new Font("Tahoma", Font.BOLD, 14));
-
-        JButton btnPlaylist = new JButton("Vai alle Mie Playlist"); // Il PlaylistButton del tuo schema
-        
-        pnlBottoni.add(btnFiltra);
-        pnlBottoni.add(btnPlaylist);
-        add(pnlBottoni, BorderLayout.SOUTH);
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // ==========================================
-        // 4. EVENTI
+        // 1. SEZIONE ALTA: RICERCA E BOTTONE PLAYLIST
+        // ==========================================
+        JPanel pnlFiltri = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        pnlFiltri.setBorder(BorderFactory.createTitledBorder("Filtra"));
+
+        pnlFiltri.add(new JLabel("Titolo:"));
+        txtTitolo = new JTextField(15);
+        pnlFiltri.add(txtTitolo);
+
+        // La tendina con la "M" (Media) del tuo schema
+        String[] tipiMedia = {"Tutti", "Audio", "Video"};
+        comboTipo = new JComboBox<>(tipiMedia);
+        pnlFiltri.add(comboTipo);
+        
+        JButton btnCerca = new JButton("Cerca");
+        pnlFiltri.add(btnCerca);
+
+        // Il famoso "Bottone Playlist" del tuo mock-up
+        JButton btnPlaylist = new JButton("Bottone Playlist");
+        btnPlaylist.setBackground(new Color(46, 204, 113)); // Verde per risaltare
+        btnPlaylist.setForeground(Color.WHITE);
+        pnlFiltri.add(Box.createHorizontalStrut(20)); // Spazio vuoto per distanziarlo
+        pnlFiltri.add(btnPlaylist);
+
+        add(pnlFiltri, BorderLayout.NORTH);
+
+        // ==========================================
+        // 2. SEZIONE CENTRALE: TABELLA RISULTATI
+        // ==========================================
+        String[] colonne = {"Item (Titolo)", "Autore", "Tipologia"};
+        modelloTabella = new DefaultTableModel(colonne, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tabellaElementi = new JTable(modelloTabella);
+        tabellaElementi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabellaElementi.setRowHeight(25);
+        
+        add(new JScrollPane(tabellaElementi), BorderLayout.CENTER);
+
+        // ==========================================
+        // 3. SEZIONE BASSA: BOTTONI INDIETRO E DETTAGLI
+        // ==========================================
+        JPanel pnlFooter = new JPanel(new BorderLayout());
+        
+        JButton btnIndietro = new JButton("< Indietro");
+        pnlFooter.add(btnIndietro, BorderLayout.WEST);
+
+        JButton btnApriElemento = new JButton("Apri Selezionato");
+        pnlFooter.add(btnApriElemento, BorderLayout.EAST);
+
+        add(pnlFooter, BorderLayout.SOUTH);
+
+        // ==========================================
+        // 4. EVENTI DEI BOTTONI
         // ==========================================
 
-        btnHome.addActionListener(new ActionListener() {
+        // EVENTO: < Indietro
+        btnIndietro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                homePage.cambiaPannelloCentrale(new JPanel()); // Svuota la home
+                System.out.println("Torno indietro...");
+                // ⚠️ IN FUTURO: homePage.cambiaPannelloCentrale(new JPanel());
             }
         });
 
+        // EVENTO: Cerca
+        btnCerca.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String testo = txtTitolo.getText().trim();
+                String tipo = (String) comboTipo.getSelectedItem();
+                eseguiRicerca(testo, tipo);
+            }
+        });
+
+        // EVENTO: Bottone Playlist (Il salto al Catalogo Playlist)
         btnPlaylist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // ⚠️ IN FUTURO: Qui chiami la classe CatalogoPlaylistView per mostrare le playlist
+                System.out.println("Salto al Catalogo delle Playlist...");
+                
+                // ⚠️ IN FUTURO: Quando avrai l'HomePage vera, de-commenta queste righe.
+                // Questa è la riga che crea il collegamento esatto della tua freccia!
+                /*
                 CatalogoPlaylist vistaPlaylist = new CatalogoPlaylist(playlistController, homePage);
                 homePage.cambiaPannelloCentrale(vistaPlaylist);
+                */
             }
         });
 
-        btnFiltra.addActionListener(new ActionListener() {
+        // EVENTO: Apri l'elemento selezionato nella tabella
+        btnApriElemento.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String titoloCercato = txtTitolo.getText().trim();
-                String tipoSelezionato = (String) comboTipo.getSelectedItem();
-
-                // ⚠️ IN FUTURO: La logica esatta dell'EBC è questa:
-                // 1. Chiedi al MediaController di cercare nel DB usando i due filtri
-                // List<ElementoMultimediale> risultati = mediaController.cercaElementiAvanzata(titoloCercato, tipoSelezionato);
+                int riga = tabellaElementi.getSelectedRow();
+                if (riga == -1) {
+                    JOptionPane.showMessageDialog(PaginaFiltraggio.this, 
+                        "Seleziona un elemento!", "Attenzione", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 
-                // 2. Crei la schermata del Catalogo passandogli la lista VERA appena ottenuta
-                // CatalogoElementiView catalogo = new CatalogoElementiView(mediaController, playlistController, homePage, risultati);
+                String titoloSelezionato = (String) modelloTabella.getValueAt(riga, 0);
+                System.out.println("Apro i dettagli di: " + titoloSelezionato);
                 
-                // Per ora, visto che stiamo simulando, apriamo il catalogo vuoto/finto
-                CatalogoElementi catalogo = new CatalogoElementi(mediaController, playlistController, homePage);
-                homePage.cambiaPannelloCentrale(catalogo);
+                // ⚠️ IN FUTURO: Qui recuperi l'elemento vero dal DB e lo passi alla PaginaElemento
+                /*
+                ElementoMultimediale el = listaRisultati.get(riga);
+                PaginaElemento vistaDettaglio = new PaginaElemento(mediaController, playlistController, homePage, el);
+                homePage.cambiaPannelloCentrale(vistaDettaglio);
+                */
             }
         });
+    }
+
+    /**
+     * Metodo per aggiornare la tabella
+     */
+    private void eseguiRicerca(String filtroTesto, String filtroTipo) {
+        modelloTabella.setRowCount(0); 
+        
+        // ⚠️ IN FUTURO: DELEGA AL CONTROLLER
+        // this.listaRisultati = mediaController.filtraElementi(filtroTesto, filtroTipo);
+        // for(ElementoMultimediale el : listaRisultati) { modelloTabella.addRow(...); }
+
+        System.out.println("Ricerca nel DB per Titolo: '" + filtroTesto + "' - Tipo: " + filtroTipo);
+        
+        // Dati di plastica per test
+        modelloTabella.addRow(new Object[]{"Item 1", "Autore 1", "Audio"});
+        modelloTabella.addRow(new Object[]{"Item 2", "Autore 2", "Video"});
+        modelloTabella.addRow(new Object[]{"Item 3", "Autore 3", "Audio"});
     }
 }
