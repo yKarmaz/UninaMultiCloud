@@ -10,7 +10,9 @@ import entities.*;
 public class DBConnection {
 
 	public static void main(String args[ ]) throws Exception { 
-		 try {
+		 /*
+		  * 
+		  * try {
 			 Class.forName("org.postgresql.Driver");
 			 String url = "jdbc:postgresql://localhost:5432/UninaMultiCloud";
 			 String nomeUtente = "postgres";
@@ -26,22 +28,7 @@ public class DBConnection {
 			 ElementoMultimediale contenutoTest = new Audio(21, "descrizione modificata TEST", "Java", 120, LocalDate.now(), "ImmagineTest.png", generico, 120);
 			 
 			 
-			 elementoDao.cancellaContenuto(contenutoTest);
-		 
-			
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
-			 
+			 elementoDao.cancellaContenuto(contenutoTest);	 
 			 
 			 conn.close();
 		}
@@ -55,7 +42,7 @@ public class DBConnection {
 			 System.out.println(e);
 		 }
 		 
-		 
+		 */
 		 
 		 
 		 

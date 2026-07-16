@@ -4,7 +4,7 @@ import entities.Utente;
 public interface UtenteDao {
 	int salvaUtente(Utente utente);
 	
-	Utente trovaUtenteDaID(int id);
+	Utente trovaUtente(String username, String password);
 	
 	boolean modificaUtente(Utente utente);
 	

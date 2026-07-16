@@ -38,11 +38,12 @@ public class UtenteDAO_Impl implements UtenteDao{
 	}
 
 	@Override
-	public Utente trovaUtenteDaID(int id) {
-		String query = "SELECT * FROM utenti WHERE id_utente = ?";
+	public Utente trovaUtente(String username, String password) {
+		String query = "SELECT * FROM utenti WHERE username = ? AND psswrd = ?";
 		try(PreparedStatement statement = connessione.prepareStatement(query))
 		{
-			statement.setInt(1, id);
+			statement.setString(1, username);
+			statement.setString(2, password);
 			ResultSet rs = statement.executeQuery();
 			if(rs.next())
 			{
