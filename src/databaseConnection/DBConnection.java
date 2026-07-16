@@ -1,54 +1,37 @@
 package databaseConnection;
-import java.sql.*;
-import java.time.LocalDate;
-import DAO.*;
-import DAO.UtenteDao;
-import DAO.impl.*;
-import entities.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBConnection {
 
-	public static void main(String args[ ]) throws Exception { 
-		 /*
-		  * 
-		  * try {
-			 Class.forName("org.postgresql.Driver");
-			 String url = "jdbc:postgresql://localhost:5432/UninaMultiCloud";
-			 String nomeUtente = "postgres";
-			 String password = "AleDell2006!";
-			 Connection conn = DriverManager.getConnection(url, nomeUtente, password); 
-			 System.out.println("Connessione OK \n");
-			 
-			 ElementoMultimedialeDao elementoDao = new ElementoMultimedialeDAO_Impl(conn);
-			 
-			 
-			 Utente generico = new Utente(10, password, password, password, password, password, password);
-			 
-			 ElementoMultimediale contenutoTest = new Audio(21, "descrizione modificata TEST", "Java", 120, LocalDate.now(), "ImmagineTest.png", generico, 120);
-			 
-			 
-			 elementoDao.cancellaContenuto(contenutoTest);	 
-			 
-			 conn.close();
-		}
-		catch (ClassNotFoundException e) {
-			 System.out.println("DB driver non trovato \n");
-			 System.out.println(e);
-		}
-		catch(SQLException e) {
-			 System.out.println("Connessione Fallita \n"); 
-			 e.printStackTrace();
-			 System.out.println(e);
-		 }
-		 
-		 */
-		 
-		 
-		 
-		 
-		 
-		 
-	}
+    private static DBConnection instance;
+    private Connection connection;
 
+    private static final String URL = "jdbc:postgresql://localhost:5432/UninaMultiCloud";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "AleDell2006!";
+
+    private DBConnection() {
+        try {
+            Class.forName("org.postgresql.Driver");
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Connessione al database stabilita con successo");
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("Errore nell'inizializzazione del driver o della connessione DB:");
+            e.printStackTrace();
+        }
+    }
+
+    public static DBConnection getInstance() throws SQLException {
+        if (instance == null || instance.getConnection() == null || instance.getConnection().isClosed()) {
+            instance = new DBConnection();
+        }
+        return instance;
+    }
+
+    public Connection getConnection() {
+        return this.connection;
+    }
 }

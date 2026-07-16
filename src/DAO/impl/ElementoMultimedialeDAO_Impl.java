@@ -66,9 +66,11 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao{
 			try (ResultSet rs = statement.executeQuery()) {
 				if (rs.next()) {
 					// 1. Recuperiamo l'utente proprietario usando il suo DAO
-					int idProprietario = rs.getInt("id_utente");
+					
+					String usernameProprietario = rs.getString("username");
+					String passwordProprietario = rs.getString("psswrd");
 					UtenteDao utenteDao = new UtenteDAO_Impl(connessione);
-					Utente proprietario = utenteDao.trovaUtenteDaID(idProprietario);
+					Utente proprietario = utenteDao.trovaUtente(usernameProprietario, passwordProprietario);
 					
 					// 2. Leggiamo i campi comuni e il discriminatore del tipo
 					String tipoElemento = rs.getString("tipoElemento");
