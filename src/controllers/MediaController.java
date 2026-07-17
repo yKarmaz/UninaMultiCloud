@@ -1,51 +1,58 @@
 package controllers;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+
+import DAO.ElementoMultimedialeDao;
+import DAO.impl.ElementoMultimedialeDAO_Impl;
+import databaseConnection.DBConnection;
+import entities.Audio;
+import entities.Video;
 import entities.ElementoMultimediale;
-// import entities.Audio; // Assicurati di importare le tue Entity
-// import entities.Video;
+import entities.Utente;
 
 public class MediaController {
     
-    public MediaController() {
-        // Qui in futuro istanzierai il MediaDAO passandogli la DBConnection
-        // this.mediaDAO = new MediaDAO_Impl(DBConnection.getConnection());
+    private ElementoMultimedialeDao mediaDao;
+    private SessionController sessionCtrl;
+
+    // Richiede il SessionController nel costruttore!
+    public MediaController(SessionController sessionCtrl) {
+        this.sessionCtrl = sessionCtrl;
+        try {
+            Connection conn = DBConnection.getInstance().getConnection();
+            this.mediaDao = new ElementoMultimedialeDAO_Impl(conn);
+        } catch (Exception e) {
+            System.err.println("Errore: Impossibile collegare MediaController al DB");
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Questo metodo verrà chiamato dalla tua Boundary (es. CatalogView)
-     * quando l'utente clicca su "Cerca" o apre il catalogo.
-     */
-    public List<ElementoMultimediale> cercaBrani(String testoRicerca) {
-        
-        // --- IN FUTURO SARA' COSI' ---
-        // return mediaDAO.cercaPerTitoloOAutore(testoRicerca);
-        
-        // --- FAKE DATA PER TESTARE LA GUI OGGI ---
-        List<ElementoMultimediale> risultatiFinti = new ArrayList<>();
-        System.out.println("Ricerca simulata per: " + testoRicerca);
-        
-        // Nota: Adatta questi costruttori a quelli reali che hai nelle tue classi Audio/Video
-        // risultatiFinti.add(new Audio("Bohemian Rhapsody", "Queen", 355));
-        // risultatiFinti.add(new Video("Live at Wembley", "Queen", 7200));
-        
-        return risultatiFinti;
-    }
-
-    /**
-     * Chiamato dalla Boundary UploadView
-     */
-    public boolean caricaNuovoElemento(String titolo, String autore, String percorsoFile, String tipo) {
-        // Validazione base
-        if(titolo.isEmpty() || autore.isEmpty() || percorsoFile.isEmpty()) {
+    public boolean caricaNuovoElemento(String titolo, String descrizione, String percorso, String tipo) {
+        // 1. Chiedo al Session chi è l'utente. Se è null, blocco l'operazione.
+        Utente proprietario = sessionCtrl.getUtenteLoggato();
+        if (proprietario == null) {
+            System.err.println("Errore: Nessun utente loggato. Impossibile fare l'upload.");
             return false;
         }
-        
-        // --- IN FUTURO ---
-        // Passerai i dati al DAO per fare l'INSERT nel DB
-        
-        System.out.println("Simulazione: Elemento '" + titolo + "' di " + autore + " caricato con successo!");
-        return true; 
+
+        // 2. Creo l'Entity corretta (Dati dummy per durata, data e bitrate/risoluzione per ora)
+        ElementoMultimediale nuovoElemento;
+        if (tipo.equals("Audio")) {
+            nuovoElemento = new Audio(0, descrizione, titolo, 200, java.time.LocalDate.now(), percorso, proprietario, 320);
+        } else {
+            nuovoElemento = new Video(0, descrizione, titolo, 200, java.time.LocalDate.now(), percorso, proprietario, "1080p");
+        }
+
+        // 3. Passo tutto al DAO del tuo compagno
+        int idGenerato = mediaDao.salvaContenuto(nuovoElemento);
+        return idGenerato > 0;
+    }
+
+    // ⚠️ STUB: Metodo vuoto pronto per quando il compagno farà la query delle liste
+    public List<ElementoMultimediale> filtraElementi(String testoDaCercare, String tipo) {
+        // In futuro sarà: return mediaDao.cercaElementi(testoDaCercare, tipo);
+        return new ArrayList<>(); 
     }
 }

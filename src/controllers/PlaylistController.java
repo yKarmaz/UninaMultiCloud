@@ -1,40 +1,66 @@
 package controllers;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+import DAO.PlaylistDao;
+import DAO.impl.PlaylistDAO_Impl;
+import databaseConnection.DBConnection;
 import entities.Playlist;
-// import entities.PlaylistPubblica;
+import entities.PlaylistPrivata;
+import entities.PlaylistPubblica;
+import entities.PlaylistCondivisa;
 import entities.Utente;
 
 public class PlaylistController {
     
-    private SessionController sessione; // Serve per sapere chi è loggato
+    private PlaylistDao playlistDao;
+    private SessionController sessionCtrl;
 
-    public PlaylistController(SessionController sessione) {
-        this.sessione = sessione;
-        // Qui in futuro: this.playlistDAO = new PlaylistDAO_Impl(DBConnection.getConnection());
+    public PlaylistController(SessionController sessionCtrl) {
+        this.sessionCtrl = sessionCtrl;
+        try {
+            Connection conn = DBConnection.getInstance().getConnection();
+            this.playlistDao = new PlaylistDAO_Impl(conn);
+        } catch (Exception e) {
+            System.err.println("Errore: Impossibile collegare PlaylistController al DB");
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Chiamato dalla Boundary CreaPlaylistView
-     */
-    public boolean creaNuovaPlaylist(String nome, String tipologia) {
-        Utente utenteProprietario = sessione.getUtenteLoggato();
+    public boolean creaNuovaPlaylist(String nome, String tipo, String categoria) {
+        Utente proprietario = sessionCtrl.getUtenteLoggato();
+        if (proprietario == null) return false;
+
+        Playlist nuovaPlaylist;
         
-        if (utenteProprietario == null) {
-            System.err.println("Errore critico: Nessun utente loggato in RAM!");
-            return false;
+        // Smisto le Entity in base alla tendina della grafica
+        switch (tipo) {
+            case "Pubblica":
+                nuovaPlaylist = new PlaylistPubblica(0, nome, proprietario, categoria);
+                break;
+            case "Condivisa":
+                nuovaPlaylist = new PlaylistCondivisa(0, nome, proprietario);
+                break;
+            default:
+                nuovaPlaylist = new PlaylistPrivata(0, nome, proprietario);
+                break;
         }
 
-        if (nome.isEmpty()) {
-            return false;
-        }
+        // Chiamo il DAO del tuo compagno
+        Playlist salvata = playlistDao.salvaPlaylist(nuovaPlaylist);
+        return salvata != null; 
+    }
 
-        // --- IN FUTURO ---
-        // Playlist nuova = null;
-        // if (tipologia.equals("Pubblica")) nuova = new PlaylistPubblica(nome, utenteProprietario, "Generale");
-        // return playlistDAO.salvaPlaylist(nuova);
+    // ⚠️ STUB: Metodi per popolare le tabelle del CatalogoPlaylist
+    public List<Playlist> getMiePlaylistPrivate() {
+        // return playlistDao.trovaPlaylistPrivateUtente(sessionCtrl.getUtenteLoggato().getIdUtente());
+        return new ArrayList<>();
+    }
 
-        // --- FAKE LOGIC ---
-        System.out.println("Simulazione DB: Playlist '" + nome + "' [" + tipologia + "] salvata per l'utente " + utenteProprietario.getUsername());
-        return true;
+    public List<Playlist> getPlaylistPubbliche() {
+        // return playlistDao.trovaTutteLePubbliche();
+        return new ArrayList<>();
     }
 }

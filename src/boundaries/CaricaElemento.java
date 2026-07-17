@@ -8,12 +8,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import controllers.MediaController;
-// import boundaries.HomePage; // (Scommenta questo nel progetto vero)
 
 public class CaricaElemento extends JPanel {
 
     private MediaController mediaController;
-    private JPanel homePage; // L'ho messo JPanel per il BancoDiProva. Mettilo HomePage!
+    private JPanel homePage; // ⚠️ IN FUTURO: Cambia in HomePage quando unisci i file
 
     private JTextField txtTitolo;
     private JTextArea txtDescrizione;
@@ -35,7 +34,7 @@ public class CaricaElemento extends JPanel {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- 1. HEADER (Tasto Indietro in alto a sinistra, Titolo centrato) ---
+        // --- 1. HEADER ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         JButton btnIndietro = new JButton("< Indietro");
         btnIndietro.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -52,7 +51,7 @@ public class CaricaElemento extends JPanel {
         JPanel pnlForm = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 15, 10, 15); 
-        gbc.anchor = GridBagConstraints.NORTHWEST; // Allinea tutto in alto a sinistra nella propria cella
+        gbc.anchor = GridBagConstraints.NORTHWEST;
 
         // Riga 0: Titolo
         gbc.gridx = 0; gbc.gridy = 0;
@@ -62,7 +61,7 @@ public class CaricaElemento extends JPanel {
 
         gbc.gridx = 1; gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtTitolo = new JTextField(25); // Larghezza fissa
+        txtTitolo = new JTextField(25);
         txtTitolo.setFont(new Font("Tahoma", Font.PLAIN, 14));
         pnlForm.add(txtTitolo, gbc);
 
@@ -134,64 +133,55 @@ public class CaricaElemento extends JPanel {
         // EVENTI
         // ==========================================
 
-        btnIndietro.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // homePage.cambiaPannelloCentrale(new JPanel()); // Scommenta nel progetto vero
-                System.out.println("Torno indietro...");
+        btnIndietro.addActionListener(e -> {
+            System.out.println("Torno indietro...");
+            // homePage.cambiaPannelloCentrale(new JPanel()); // ⚠️ Scommenta nel progetto vero
+        });
+
+        btnScegliFile.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filtroMedia = new FileNameExtensionFilter("File Audio e Video (*.mp3, *.mp4, *.wav)", "mp3", "mp4", "wav");
+            fileChooser.setFileFilter(filtroMedia);
+            
+            int risultato = fileChooser.showOpenDialog(CaricaElemento.this);
+            
+            if (risultato == JFileChooser.APPROVE_OPTION) {
+                File fileSelezionato = fileChooser.getSelectedFile();
+                percorsoFileSelezionato = fileSelezionato.getAbsolutePath(); 
+                lblPercorsoFile.setText(fileSelezionato.getName());
+                lblPercorsoFile.setForeground(Color.BLACK);
             }
         });
 
-        btnScegliFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                
-                // 🛑 IL FILTRO: Obbliga l'utente a scegliere formati sensati!
-                FileNameExtensionFilter filtroMedia = new FileNameExtensionFilter("File Audio e Video (*.mp3, *.mp4, *.wav)", "mp3", "mp4", "wav");
-                fileChooser.setFileFilter(filtroMedia);
-                
-                int risultato = fileChooser.showOpenDialog(CaricaElemento.this);
-                
-                if (risultato == JFileChooser.APPROVE_OPTION) {
-                    File fileSelezionato = fileChooser.getSelectedFile();
-                    percorsoFileSelezionato = fileSelezionato.getAbsolutePath(); 
-                    lblPercorsoFile.setText(fileSelezionato.getName());
-                    lblPercorsoFile.setForeground(Color.BLACK);
-                }
+        btnCarica.addActionListener(e -> {
+            String titolo = txtTitolo.getText().trim();
+            String descrizione = txtDescrizione.getText().trim();
+            String tipo = rbAudio.isSelected() ? "Audio" : "Video";
+
+            // Controllo rigoroso sui campi
+            if (titolo.isEmpty() || descrizione.isEmpty() || percorsoFileSelezionato.isEmpty()) {
+                JOptionPane.showMessageDialog(CaricaElemento.this, 
+                    "Compila tutti i campi e seleziona un file!", "Errore", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-        });
 
-        btnCarica.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String titolo = txtTitolo.getText().trim();
-                String descrizione = txtDescrizione.getText().trim();
-                String tipo = rbAudio.isSelected() ? "Audio" : "Video";
+            // QUI AVVIENE LA MAGIA: Deleghi tutto al Controller.
+            // Il Controller, a sua volta, userà il DAO. Tu qui non devi sapere nulla di SQL.
+            boolean successo = mediaController.caricaNuovoElemento(titolo, descrizione, percorsoFileSelezionato, tipo);
 
-                if (titolo.isEmpty() || descrizione.isEmpty() || percorsoFileSelezionato.isEmpty()) {
-                    JOptionPane.showMessageDialog(CaricaElemento.this, 
-                        "Compila tutti i campi e seleziona un file!", "Errore", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                // Delega al Controller
-                boolean successo = mediaController.caricaNuovoElemento(titolo, descrizione, percorsoFileSelezionato, tipo);
-
-                if (successo) {
-                    JOptionPane.showMessageDialog(CaricaElemento.this, 
-                        "Elemento caricato con successo!", "Upload Completato", JOptionPane.INFORMATION_MESSAGE);
-                    
-                    // Reset
-                    txtTitolo.setText("");
-                    txtDescrizione.setText("");
-                    percorsoFileSelezionato = "";
-                    lblPercorsoFile.setText("Nessun file selezionato");
-                    lblPercorsoFile.setForeground(Color.GRAY);
-                } else {
-                    JOptionPane.showMessageDialog(CaricaElemento.this, 
-                        "Errore durante l'upload del file.", "Errore Server", JOptionPane.ERROR_MESSAGE);
-                }
+            if (successo) {
+                JOptionPane.showMessageDialog(CaricaElemento.this, 
+                    "Elemento caricato con successo!", "Upload Completato", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Reset della grafica per permettere un nuovo inserimento
+                txtTitolo.setText("");
+                txtDescrizione.setText("");
+                percorsoFileSelezionato = "";
+                lblPercorsoFile.setText("Nessun file selezionato");
+                lblPercorsoFile.setForeground(Color.GRAY);
+            } else {
+                JOptionPane.showMessageDialog(CaricaElemento.this, 
+                    "Errore durante l'upload del file.", "Errore Server", JOptionPane.ERROR_MESSAGE);
             }
         });
     }

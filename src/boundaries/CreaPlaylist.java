@@ -1,4 +1,4 @@
-package boundaries; // Controlla che il package sia corretto per te
+package boundaries; 
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,15 +11,15 @@ import controllers.PlaylistController;
 public class CreaPlaylist extends JPanel {
 
     private PlaylistController playlistController;
-    private JPanel homePage; // L'ho messo JPanel per il BancoDiProva. Mettilo HomePage!
+    private JPanel homePage; // ⚠️ IN FUTURO: Cambiare in HomePage
 
     private JTextField txtNome;
     private JRadioButton rbPubblica;
     private JRadioButton rbPrivata;
     private JRadioButton rbCondivisa;
     private ButtonGroup gruppoTipologia;
+    private JComboBox<String> comboCategoria; // AGGIUNTO: Necessario per le pubbliche
 
-    // Costruttore temporaneo per il BancoDiProva (Usa 'HomePage' nel progetto vero)
     public CreaPlaylist(PlaylistController playlistController, JPanel homePage) {
         this.playlistController = playlistController;
         this.homePage = homePage;
@@ -34,31 +34,30 @@ public class CreaPlaylist extends JPanel {
         // --- 1. TITOLO ---
         JLabel lblTitolo = new JLabel("Crea una Nuova Playlist", SwingConstants.CENTER);
         lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
-        lblTitolo.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0)); // Spazio sotto il titolo
+        lblTitolo.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0)); 
         add(lblTitolo, BorderLayout.NORTH);
 
-        // --- 2. FORM CENTRATO CON GRIDBAGLAYOUT (Perfetto per i Mock-up) ---
+        // --- 2. FORM CENTRATO CON GRIDBAGLAYOUT ---
         JPanel pnlForm = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 15, 15, 15); // Margini tra gli elementi (Sopra, Sinistra, Sotto, Destra)
-        gbc.anchor = GridBagConstraints.WEST; // Allinea tutto a sinistra della sua cella
+        gbc.insets = new Insets(15, 15, 15, 15); 
+        gbc.anchor = GridBagConstraints.WEST; 
 
-        // Riga 0 - Colonna 0: Etichetta Nome [cite: 9]
+        // Riga 0: Nome
         gbc.gridx = 0; 
         gbc.gridy = 0;
         JLabel lblNome = new JLabel("Nome della Playlist:");
         lblNome.setFont(new Font("Tahoma", Font.BOLD, 14));
         pnlForm.add(lblNome, gbc);
 
-        // Riga 0 - Colonna 1: Campo di testo Nome
         gbc.gridx = 1; 
         gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Fagli occupare lo spazio in orizzontale
+        gbc.fill = GridBagConstraints.HORIZONTAL; 
         txtNome = new JTextField(20);
         txtNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
         pnlForm.add(txtNome, gbc);
 
-        // Riga 1 - Colonna 0: Etichetta Tipologia [cite: 10]
+        // Riga 1: Tipologia
         gbc.gridx = 0; 
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
@@ -66,7 +65,6 @@ public class CreaPlaylist extends JPanel {
         lblTipo.setFont(new Font("Tahoma", Font.BOLD, 14));
         pnlForm.add(lblTipo, gbc);
 
-        // Riga 1 - Colonna 1: Bottoni Radio [cite: 11, 12, 13]
         gbc.gridx = 1; 
         gbc.gridy = 1;
         JPanel pnlRadio = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -89,10 +87,23 @@ public class CreaPlaylist extends JPanel {
         pnlRadio.add(rbCondivisa);
         pnlForm.add(pnlRadio, gbc);
 
-        // Aggiungo il form al centro
+        // Riga 2: Categoria (AGGIUNTA FONDAMENTALE)
+        gbc.gridx = 0; 
+        gbc.gridy = 2;
+        JLabel lblCategoria = new JLabel("Categoria (solo Pubblica):");
+        lblCategoria.setFont(new Font("Tahoma", Font.BOLD, 14));
+        pnlForm.add(lblCategoria, gbc);
+
+        gbc.gridx = 1; 
+        gbc.gridy = 2;
+        String[] categorie = {"Nessuna", "Musica", "Podcast", "Educazione", "Intrattenimento"};
+        comboCategoria = new JComboBox<>(categorie);
+        comboCategoria.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        pnlForm.add(comboCategoria, gbc);
+
         add(pnlForm, BorderLayout.CENTER);
 
-        // --- 3. BOTTONI DI AZIONE (In basso) ---
+        // --- 3. BOTTONI DI AZIONE ---
         JPanel pnlBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         
         JButton btnIndietro = new JButton("< Indietro");
@@ -110,21 +121,37 @@ public class CreaPlaylist extends JPanel {
         // ==========================================
         // EVENTI
         // ==========================================
+        
         btnIndietro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // homePage.cambiaPannelloCentrale(new JPanel()); // Scommenta nel progetto reale
                 System.out.println("Torno indietro (Simulazione)");
+                // ⚠️ IN FUTURO: homePage.cambiaPannelloCentrale(new JPanel()); 
             }
         });
 
+        // Evento: Abilita/Disabilita Categoria in base alla tipologia selezionata
+        ActionListener radioListener = e -> {
+            comboCategoria.setEnabled(rbPubblica.isSelected());
+        };
+        rbPubblica.addActionListener(radioListener);
+        rbPrivata.addActionListener(radioListener);
+        rbCondivisa.addActionListener(radioListener);
+        
+        // Impostazione iniziale: siccome "Privata" è di default, disabilito la tendina categoria
+        comboCategoria.setEnabled(false);
+
+        // Evento Bottone Crea
         btnCrea.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String nome = txtNome.getText().trim();
+                
                 String tipologia = "Privata"; 
                 if (rbPubblica.isSelected()) tipologia = "Pubblica";
                 if (rbCondivisa.isSelected()) tipologia = "Condivisa";
+                
+                String categoria = (String) comboCategoria.getSelectedItem();
 
                 if (nome.isEmpty()) {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
@@ -132,15 +159,19 @@ public class CreaPlaylist extends JPanel {
                     return;
                 }
 
-                boolean successo = playlistController.creaNuovaPlaylist(nome, tipologia);
+                boolean successo = playlistController.creaNuovaPlaylist(nome, tipologia, categoria);
 
                 if (successo) {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
-                        "Playlist creata con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+                        "Playlist creata con successo nel Database!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+                    // Reset grafica
                     txtNome.setText("");
+                    rbPrivata.setSelected(true);
+                    comboCategoria.setEnabled(false);
+                    comboCategoria.setSelectedIndex(0);
                 } else {
                     JOptionPane.showMessageDialog(CreaPlaylist.this, 
-                        "Errore interno. Impossibile creare la playlist.", "Errore", JOptionPane.ERROR_MESSAGE);
+                        "Errore interno. Impossibile creare la playlist.", "Errore DB", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
