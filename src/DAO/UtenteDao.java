@@ -9,4 +9,6 @@ public interface UtenteDao {
 	boolean modificaUtente(Utente utente);
 	
 	boolean cancellaUtente(Utente utente);
+
+	Utente trovaUtenteDaID(int ID);
 }

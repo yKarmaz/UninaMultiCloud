@@ -68,6 +68,40 @@ public class UtenteDAO_Impl implements UtenteDao{
 		return null;
 	}
 
+	
+	@Override
+	public Utente trovaUtenteDaID(int ID) {
+		String query = "SELECT * FROM utenti WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, ID);
+			
+			ResultSet rs = statement.executeQuery();
+			if(rs.next())
+			{
+				
+				return new Utente(
+						rs.getInt("id_utente"),
+						rs.getString("matricola"),
+						rs.getString("nome"),
+						rs.getString("cognome"),
+						rs.getString("username"),
+						rs.getString("email"),
+						rs.getString("psswrd") 
+					);
+						
+						
+			}
+			
+		} catch (SQLException e) {
+			System.err.println("Errore durante la ricerca dell'utente:");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	
 	@Override
 	public boolean modificaUtente(Utente utente) {
 		String query = "UPDATE utenti SET nome = ?, cognome = ?, username = ?, psswrd = ?, email = ?, matricola = ? WHERE id_utente = ?";

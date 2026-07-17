@@ -5,8 +5,8 @@ import java.util.UUID;
 public class PlaylistCondivisa extends Playlist {
 	private String URL_Invito;
 
-	public PlaylistCondivisa(String nome, Utente proprietario) {
-		super(nome, proprietario);
+	public PlaylistCondivisa(int ID, String nome, Utente proprietario) {
+		super(ID, nome, proprietario, "Condivisa");
 		this.URL_Invito = generaURL(); 
 	}
 	

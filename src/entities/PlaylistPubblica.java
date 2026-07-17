@@ -5,8 +5,8 @@ public class PlaylistPubblica extends Playlist {
     private String categoria;
     private int numVisualizzazioni;
 
-    public PlaylistPubblica(String nome, Utente proprietario, String categoria) {
-    	super(nome, proprietario);
+    public PlaylistPubblica(int ID, String nome, Utente proprietario, String categoria) {
+    	super(ID, nome, proprietario, "Pubblica");
     	this.categoria = categoria;
     	this.numVisualizzazioni = 0; 
     }

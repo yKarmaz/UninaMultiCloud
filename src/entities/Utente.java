@@ -101,7 +101,10 @@ public class Utente {
 		this.email = email;
 	}
 	
-	
+	public void setIdUtente(int i) //metodo di test, da cancellare
+	{
+		idUtente = i;
+	}
 	
 	
 	
