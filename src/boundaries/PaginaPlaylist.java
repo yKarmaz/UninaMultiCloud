@@ -2,81 +2,73 @@ package boundaries;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
-import controllers.PlaylistController;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Importa le tue entity
-// import entities.Playlist;
-// import entities.ElementoMultimediale;
+import controllers.MediaController;
+import controllers.PlaylistController;
 
 public class PaginaPlaylist extends JPanel {
 
     private PlaylistController playlistController;
-    private HomePage homePage;
+    // ⚠️ IN FUTURO: Aggiungi il MediaController qui per poter avviare la riproduzione
+    private MediaController mediaController;
+    private JPanel homePage;
     
-    // ⚠️ IN FUTURO: Questa classe dovrà ricevere la Playlist specifica che l'utente ha cliccato
-    // private Playlist playlistSelezionata;
-
     private JTable tabellaBrani;
     private DefaultTableModel modelloTabella;
 
-    /**
-     * Costruttore
-     * ⚠️ IN FUTURO: Aggiungi "Playlist playlistSelezionata" tra i parametri
-     */
-    public PaginaPlaylist(PlaylistController playlistController, HomePage homePage) {
-        this.playlistController = playlistController;
-        this.homePage = homePage;
-        // this.playlistSelezionata = playlistSelezionata;
+    public PaginaPlaylist(PlaylistController playCtrl, MediaController mediaCtrl, JPanel home) {
+        this.playlistController = playCtrl;
+        this.mediaController = mediaCtrl; 
+        this.homePage = home;
         
         inizializzaInterfaccia();
-        popolaTabellaConDatiFake(); // Da sostituire poi con i dati veri
+        popolaTabellaConDatiFake(); 
     }
 
     private void inizializzaInterfaccia() {
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- 1. HEADER (Tasto Indietro + Titolo) ---
-        JPanel pnlHeader = new JPanel(new BorderLayout());
+        // --- 1. HEADER (Strutturato su due righe) ---
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setLayout(new BoxLayout(pnlHeader, BoxLayout.Y_AXIS));
         
+        // Riga 1: Tasto Indietro
+        JPanel pnlBack = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         JButton btnIndietro = new JButton("< Indietro");
-        pnlHeader.add(btnIndietro, BorderLayout.WEST);
+        pnlBack.add(btnIndietro);
         
-        // ⚠️ IN FUTURO: Il testo sarà playlistSelezionata.getNome()
-        JLabel lblTitolo = new JLabel("Dettaglio Playlist: Nome Della Playlist", SwingConstants.CENTER);
-        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 20));
-        pnlHeader.add(lblTitolo, BorderLayout.CENTER);
+        // Riga 2: Titolo centrato
+        JLabel lblTitolo = new JLabel("La Mia Playlist", SwingConstants.CENTER);
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
+        lblTitolo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTitolo.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
         
+        pnlHeader.add(pnlBack);
+        pnlHeader.add(lblTitolo);
         add(pnlHeader, BorderLayout.NORTH);
 
         // --- 2. TABELLA (Centro) ---
-        // Il Modello gestisce i DATI, la JTable gestisce la GRAFICA
         String[] colonne = {"Titolo", "Autore", "Durata", "Tipo"};
-        
         modelloTabella = new DefaultTableModel(colonne, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Impedisce all'utente di modificare il testo scrivendo nella tabella
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
-        
         tabellaBrani = new JTable(modelloTabella);
-        tabellaBrani.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Seleziona solo una riga alla volta
+        tabellaBrani.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabellaBrani.setRowHeight(25);
         
-        // JScrollPane è vitale, altrimenti l'intestazione delle colonne scompare!
-        JScrollPane scrollPane = new JScrollPane(tabellaBrani);
-        add(scrollPane, BorderLayout.CENTER);
+        add(new JScrollPane(tabellaBrani), BorderLayout.CENTER);
 
         // --- 3. FOOTER (Tasto Riproduci) ---
         JPanel pnlFooter = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnRiproduci = new JButton("Riproduci Selezionato");
-        btnRiproduci.setBackground(new Color(46, 204, 113));
+        JButton btnRiproduci = new JButton("Apri Brano Selezionato");
+        btnRiproduci.setBackground(new Color(52, 152, 219));
         btnRiproduci.setForeground(Color.WHITE);
+        btnRiproduci.setFont(new Font("Tahoma", Font.BOLD, 14));
         pnlFooter.add(btnRiproduci);
         
         add(pnlFooter, BorderLayout.SOUTH);
@@ -85,45 +77,37 @@ public class PaginaPlaylist extends JPanel {
         // 4. EVENTI
         // ==========================================
 
-        btnIndietro.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // ⚠️ IN FUTURO: Invece di un pannello vuoto, dovrai dirgli di ricaricare 
-                // la classe "LeMiePlaylistView" (che farai a breve)
-                homePage.cambiaPannelloCentrale(new JPanel()); 
-            }
+        btnIndietro.addActionListener(e -> {
+            System.out.println("Torno indietro al Catalogo Playlist...");
+            // homePage.cambiaPannelloCentrale(new CatalogoPlaylist(playlistController, homePage));
         });
 
-        btnRiproduci.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int rigaSelezionata = tabellaBrani.getSelectedRow();
-                
-                // Validazione: controlla se l'utente ha effettivamente cliccato su una riga
-                if (rigaSelezionata == -1) {
-                    JOptionPane.showMessageDialog(PaginaPlaylist.this, 
-                        "Seleziona prima un brano dalla lista!", "Errore", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                String titoloSelezionato = (String) modelloTabella.getValueAt(rigaSelezionata, 0);
-                
-                // ⚠️ IN FUTURO: Qui chiamerai il MediaController per aprire il JDialog (Modale) di riproduzione
-                // mediaController.apriPlayer(elementoSelezionato);
-
+        btnRiproduci.addActionListener(e -> {
+            int rigaSelezionata = tabellaBrani.getSelectedRow();
+            if (rigaSelezionata == -1) {
                 JOptionPane.showMessageDialog(PaginaPlaylist.this, 
-                    "Simulazione Riproduzione in corso per: " + titoloSelezionato, "Player", JOptionPane.INFORMATION_MESSAGE);
+                    "Seleziona prima un brano dalla lista!", "Errore", JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            String titoloSelezionato = (String) modelloTabella.getValueAt(rigaSelezionata, 0);
+            
+            // ⚠️ IN FUTURO: DELEGA L'APERTURA. Passiamo 'this' come pannello precedente!
+            // PaginaElemento dettaglio = new PaginaElemento(mediaController, playlistController, homePage, elementoReale, this);
+            // homePage.cambiaPannelloCentrale(dettaglio);
+            
+            // LOGICA FAKE PER TEST
+            PaginaElemento vistaDettaglio = new PaginaElemento(mediaController, playlistController, homePage, titoloSelezionato, this);
+            
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            topFrame.getContentPane().removeAll();
+            topFrame.getContentPane().add(vistaDettaglio);
+            topFrame.revalidate();
+            topFrame.repaint();
         });
     }
 
-    /**
-     * Metodo per testare la grafica oggi.
-     * ⚠️ IN FUTURO: Svuoterai questo metodo e farai un ciclo FOR 
-     * sulla lista 'playlistSelezionata.getElementi()' per aggiungere le righe.
-     */
     private void popolaTabellaConDatiFake() {
-        // Aggiungiamo righe finte al modello
         modelloTabella.addRow(new Object[]{"Bohemian Rhapsody", "Queen", "05:55", "Audio"});
         modelloTabella.addRow(new Object[]{"Stairway to Heaven", "Led Zeppelin", "08:02", "Audio"});
         modelloTabella.addRow(new Object[]{"Live at Wembley", "Queen", "1:50:00", "Video"});

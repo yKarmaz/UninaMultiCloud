@@ -3,6 +3,7 @@ package boundaries;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import controllers.MediaController;
 import controllers.PlaylistController;
 
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.awt.event.ActionListener;
 public class CatalogoPlaylist extends JPanel {
 
     private PlaylistController playlistController;
+    private MediaController mediaController;
     private HomePage homePage;
 
     private JTabbedPane pannelloSchede;
@@ -19,8 +21,9 @@ public class CatalogoPlaylist extends JPanel {
     private JTable tabellaPubbliche;
     private JTable tabellaCondivise;
 
-    public CatalogoPlaylist(PlaylistController playlistController, HomePage homePage) {
+    public CatalogoPlaylist(PlaylistController playlistController, MediaController mediaController, HomePage homePage) {
         this.playlistController = playlistController;
+        this.mediaController = mediaController; // <-- Aggiunto
         this.homePage = homePage;
         
         inizializzaInterfaccia();
@@ -104,7 +107,7 @@ public class CatalogoPlaylist extends JPanel {
                 // Playlist p = playlistController.getPlaylistPerNome(nomePlaylist);
                 
                 // Per ora, apriamo semplicemente l'interfaccia finta di prima
-                PaginaPlaylist vistaDettaglio = new PaginaPlaylist(playlistController, homePage /* , p */);
+                PaginaPlaylist vistaDettaglio = new PaginaPlaylist(playlistController, mediaController, homePage);
                 homePage.cambiaPannelloCentrale(vistaDettaglio);
             }
         });

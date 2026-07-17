@@ -1,69 +1,74 @@
 package boundaries;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import controllers.MediaController;
 import controllers.PlaylistController;
-
-import java.awt.*;
+// import boundaries.HomePage; // Scommenta nel progetto vero
 
 public class PaginaElemento extends JPanel {
 
     private MediaController mediaController;
     private PlaylistController playlistController;
-    private HomePage homePage;
+    private JPanel homePage; 
     
-    // ⚠️ IN FUTURO: Al posto della Stringa, riceverai l'oggetto "ElementoMultimediale elemento"
     private String titoloElementoFake; 
+    private JPanel pannelloPrecedente; // 👈 IL SEGRETO DELLA NAVIGAZIONE!
 
     private JComboBox<String> comboMiePlaylist;
 
-    public PaginaElemento(MediaController mediaCtrl, PlaylistController playCtrl, HomePage home, String titoloElemento) {
+    // Guarda il costruttore: ora richiede il "pannelloPrecedente"
+    public PaginaElemento(MediaController mediaCtrl, PlaylistController playCtrl, JPanel home, String titoloElemento, JPanel pannelloPrecedente) {
         this.mediaController = mediaCtrl;
         this.playlistController = playCtrl;
         this.homePage = home;
         this.titoloElementoFake = titoloElemento;
+        this.pannelloPrecedente = pannelloPrecedente; 
         
         inizializzaInterfaccia();
     }
 
     private void inizializzaInterfaccia() {
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // --- 1. HEADER ---
-        JPanel pnlHeader = new JPanel(new BorderLayout());
-        JButton btnIndietro = new JButton("< Torna al Catalogo");
-        pnlHeader.add(btnIndietro, BorderLayout.WEST);
+        // --- 1. HEADER (Tasto Indietro) ---
+        JPanel pnlHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnIndietro = new JButton("< Indietro");
+        pnlHeader.add(btnIndietro);
         add(pnlHeader, BorderLayout.NORTH);
 
-        // --- 2. INFO ELEMENTO ---
+        // --- 2. CONTENUTO CENTRALE COMPATTO ---
         JPanel pnlCentro = new JPanel();
-        pnlCentro.setLayout(new BoxLayout(pnlCentro, BoxLayout.Y_AXIS));
+        pnlCentro.setLayout(new BoxLayout(pnlCentro, BoxLayout.Y_AXIS)); // Impila verticalmente
         
-        // ⚠️ IN FUTURO: Usa i getter del tuo oggetto, es: elemento.getTitolo()
-        JLabel lblTitolo = new JLabel("Titolo: " + titoloElementoFake);
-        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
+        JLabel lblTitolo = new JLabel(titoloElementoFake);
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 28));
+        lblTitolo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JLabel lblAutore = new JLabel("Autore: Sconosciuto (Fake)");
         lblAutore.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        lblAutore.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         pnlCentro.add(lblTitolo);
         pnlCentro.add(Box.createRigidArea(new Dimension(0, 10)));
         pnlCentro.add(lblAutore);
-        pnlCentro.add(Box.createRigidArea(new Dimension(0, 30)));
+        pnlCentro.add(Box.createRigidArea(new Dimension(0, 40)));
 
-        // --- 3. SEZIONE AGGIUNGI A PLAYLIST ---
-        JPanel pnlAggiungi = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // --- 3. SEZIONE AGGIUNGI A PLAYLIST (Ora non si allarga a dismisura) ---
+        JPanel pnlAggiungi = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         pnlAggiungi.setBorder(BorderFactory.createTitledBorder("Aggiungi alle tue Playlist"));
+        // Limita l'altezza del pannello per non farlo esplodere
+        pnlAggiungi.setMaximumSize(new Dimension(500, 80)); 
         
-        // ⚠️ IN FUTURO: Chiamerai playlistController.getMiePlaylist(utenteLoggato) 
-        // per riempire dinamicamente questa tendina.
         String[] playlistFittizie = {"Studio Notturno", "Rock Classico", "Palestra"};
         comboMiePlaylist = new JComboBox<>(playlistFittizie);
-        
         JButton btnAggiungi = new JButton("Aggiungi");
-        pnlAggiungi.add(new JLabel("Seleziona Playlist: "));
+        
+        pnlAggiungi.add(new JLabel("Seleziona: "));
         pnlAggiungi.add(comboMiePlaylist);
         pnlAggiungi.add(btnAggiungi);
         
@@ -72,8 +77,9 @@ public class PaginaElemento extends JPanel {
 
         // --- 4. FOOTER (Riproduci) ---
         JPanel pnlFooter = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        pnlFooter.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         JButton btnRiproduci = new JButton("▶ RIPRODUCI ORA");
-        btnRiproduci.setFont(new Font("Tahoma", Font.BOLD, 18));
+        btnRiproduci.setFont(new Font("Tahoma", Font.BOLD, 20));
         btnRiproduci.setBackground(new Color(46, 204, 113));
         btnRiproduci.setForeground(Color.WHITE);
         pnlFooter.add(btnRiproduci);
@@ -84,24 +90,20 @@ public class PaginaElemento extends JPanel {
         // ==========================================
 
         btnIndietro.addActionListener(e -> {
-            // Ricarica il catalogo pulito
-            homePage.cambiaPannelloCentrale(new CatalogoElementi(mediaController, playlistController, homePage));
+            // MAGIA: Torna esattamente alla pagina da cui sei venuto!
+            homePage.add(pannelloPrecedente); // Rimuovi se usi CardLayout vero
+            // homePage.cambiaPannelloCentrale(pannelloPrecedente); // Usa questo nel progetto
+            
+            // FAKE LOGIC PER IL TEST DI OGGI: chiudo e riapro nel BancoDiProva
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            topFrame.getContentPane().removeAll();
+            topFrame.getContentPane().add(pannelloPrecedente);
+            topFrame.revalidate();
+            topFrame.repaint();
         });
 
-        btnRiproduci.addActionListener(e -> {
-            // ⚠️ IN FUTURO: mediaController.registraFruizione(elementoReale);
-            JOptionPane.showMessageDialog(this, "Riproduzione avviata per: " + titoloElementoFake, "Player", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        btnAggiungi.addActionListener(e -> {
-            String playlistSelezionata = (String) comboMiePlaylist.getSelectedItem();
-            
-            if(playlistSelezionata == null) return;
-            
-            // ⚠️ IN FUTURO: DELEGA AL CONTROLLER (EBC)
-            // boolean successo = playlistController.aggiungiElemento(elementoReale, playlistReale);
-            
-            JOptionPane.showMessageDialog(this, "Brano aggiunto a " + playlistSelezionata + "!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-        });
+        btnRiproduci.addActionListener(e -> JOptionPane.showMessageDialog(this, "Riproduzione in corso...", "Player", JOptionPane.INFORMATION_MESSAGE));
+        
+        btnAggiungi.addActionListener(e -> JOptionPane.showMessageDialog(this, "Brano aggiunto a " + comboMiePlaylist.getSelectedItem() + "!", "Successo", JOptionPane.INFORMATION_MESSAGE));
     }
 }
