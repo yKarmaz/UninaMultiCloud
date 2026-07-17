@@ -1,16 +1,17 @@
 package DAO;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import entities.*;
 
 public interface FruizioneDao {
 
-int salvaPlaylist(Fruizione fruizione);
+	Fruizione SalvaFruizione(Fruizione fruizione);
 	
-	Fruizione trovaPlaylistDaID(Utente u, ElementoMultimediale e, Timestamp momentoFruizione );
+	Fruizione trovaFruizione(Fruizione fruizione);
 	
-	boolean modificaFruizione(Fruizione fruizione);
+	Fruizione modificaFruizione(Fruizione vecchiaFruizione, Fruizione nuovaFruizione);
 	
 	boolean cancellaFruizione(Fruizione fruizione);
 }

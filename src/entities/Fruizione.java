@@ -1,16 +1,16 @@
 package entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Fruizione {
 	
 	private int idElemento;
 	private int idUtente;
-	private LocalDate dataFruizione;
-	public Fruizione(int idElemento, int idUtente) {
+	private LocalDateTime dataFruizione;
+	public Fruizione(int idElemento, int idUtente, LocalDateTime dataFruizione) {
 		this.idElemento = idElemento;
 		this.idUtente = idUtente;
-		dataFruizione = LocalDate.now();
+		this.dataFruizione = dataFruizione;
 	}
 	public int getIdElemento() {
 		return idElemento;
@@ -24,10 +24,10 @@ public class Fruizione {
 	public void setIdUtente(int idUtente) {
 		this.idUtente = idUtente;
 	}
-	public LocalDate getDataFruizione() {
+	public LocalDateTime getDataFruizione() {
 		return dataFruizione;
 	}
-	public void setDataFruizione(LocalDate dataFruizione) {
+	public void setDataFruizione(LocalDateTime dataFruizione) {
 		this.dataFruizione = dataFruizione;
 	}
 	
