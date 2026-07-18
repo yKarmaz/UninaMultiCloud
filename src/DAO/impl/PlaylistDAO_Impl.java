@@ -346,7 +346,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        return listaPlaylist;
 	    }
 
-	    // UNICA QUERY EFFICIENTE: Estrae le playlist e decide il tipo tramite le LEFT JOIN
+	    //Estrae le playlist e decide il tipo tramite le LEFT JOIN
 	    String query = "SELECT p.ID_Playlist, p.nome, "
 	                 + "pub.numvisualizzazioni, "
 	                 + "cond.URL_Invito, "
