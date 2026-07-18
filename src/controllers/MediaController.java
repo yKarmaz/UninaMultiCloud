@@ -50,9 +50,8 @@ public class MediaController {
         return idGenerato > 0;
     }
 
-    // ⚠️ STUB: Metodo vuoto pronto per quando il compagno farà la query delle liste
     public List<ElementoMultimediale> filtraElementi(String testoDaCercare, String tipo) {
-        // In futuro sarà: return mediaDao.cercaElementi(testoDaCercare, tipo);
-        return new ArrayList<>(); 
+        // Il Controller fa da ponte. Qui potresti aggiungere logiche di business 
+        return mediaDao.cercaElementi(testoDaCercare, tipo);
     }
 }

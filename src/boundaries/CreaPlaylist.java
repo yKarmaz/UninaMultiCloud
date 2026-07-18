@@ -11,7 +11,7 @@ import controllers.PlaylistController;
 public class CreaPlaylist extends JPanel {
 
     private PlaylistController playlistController;
-    private JPanel homePage; // ⚠️ IN FUTURO: Cambiare in HomePage
+    private HomePage homePage; // ⚠️ IN FUTURO: Cambiare in HomePage
 
     private JTextField txtNome;
     private JRadioButton rbPubblica;
@@ -20,7 +20,7 @@ public class CreaPlaylist extends JPanel {
     private ButtonGroup gruppoTipologia;
     private JComboBox<String> comboCategoria; // AGGIUNTO: Necessario per le pubbliche
 
-    public CreaPlaylist(PlaylistController playlistController, JPanel homePage) {
+    public CreaPlaylist(PlaylistController playlistController, HomePage homePage) {
         this.playlistController = playlistController;
         this.homePage = homePage;
         

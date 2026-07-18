@@ -12,7 +12,7 @@ import controllers.MediaController;
 public class CaricaElemento extends JPanel {
 
     private MediaController mediaController;
-    private JPanel homePage; // ⚠️ IN FUTURO: Cambia in HomePage quando unisci i file
+    private HomePage homePage; // ⚠️ IN FUTURO: Cambia in HomePage quando unisci i file
 
     private JTextField txtTitolo;
     private JTextArea txtDescrizione;
@@ -23,7 +23,7 @@ public class CaricaElemento extends JPanel {
     private JLabel lblPercorsoFile; 
     private String percorsoFileSelezionato = ""; 
 
-    public CaricaElemento(MediaController mediaController, JPanel homePage) {
+    public CaricaElemento(MediaController mediaController, HomePage homePage) {
         this.mediaController = mediaController;
         this.homePage = homePage;
         

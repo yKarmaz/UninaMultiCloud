@@ -102,7 +102,6 @@ public class CatalogoElementi extends JPanel {
             // ⚠️ IN FUTURO: Recupererai l'OGGETTO ElementoMultimediale vero per passarlo alla view successiva.
             // ElementoMultimediale el = listaRisultati.get(riga);
             
-         // ⚠️ IN FUTURO: Passiamo 'this' come quinto parametro (il pannello precedente)
             PaginaElemento dettaglio = new PaginaElemento(mediaController, playlistController, homePage, titoloSelezionato, this);
             homePage.cambiaPannelloCentrale(dettaglio);
         });
