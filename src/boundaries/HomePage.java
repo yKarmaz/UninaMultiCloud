@@ -31,7 +31,7 @@ public class HomePage extends JFrame {
         sidebar.setPreferredSize(new Dimension(220, 0));
 
         JButton btnCerca = new JButton("Esplora Elementi");
-        JButton btnMiePlaylist = new JButton("Catalogo Playlist");
+        JButton btnMiePlaylist = new JButton("Le mie Playlist");
         JButton btnCreaPlaylist = new JButton("Crea Playlist");
         JButton btnNuovoElemento = new JButton("Carica Elemento");
         JButton btnReport = new JButton("Report Statistiche");
