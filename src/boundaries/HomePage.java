@@ -30,8 +30,8 @@ public class HomePage extends JFrame {
         sidebar.setBackground(Color.LIGHT_GRAY);
         sidebar.setPreferredSize(new Dimension(220, 0));
 
-        JButton btnCerca = new JButton("Esplora Catalogo");
-        JButton btnMiePlaylist = new JButton("Le Mie Playlist");
+        JButton btnCerca = new JButton("Esplora Elementi");
+        JButton btnMiePlaylist = new JButton("Catalogo Playlist");
         JButton btnCreaPlaylist = new JButton("Crea Playlist");
         JButton btnNuovoElemento = new JButton("Carica Elemento");
         JButton btnReport = new JButton("Report Statistiche");

@@ -19,7 +19,7 @@ public interface PlaylistDao {
 	
 	ArrayList<Playlist> listaPlaylistProprie(Utente utente);
 	
-	ArrayList<Playlist> listaPlaylistInCondivisioneConMe(Utente utente);
+	ArrayList<Playlist> listaPlaylistInCondivisioneConMeDaMe(Utente utente);
 	
 	ArrayList<Playlist> trovaTutteLePubbliche();
 	

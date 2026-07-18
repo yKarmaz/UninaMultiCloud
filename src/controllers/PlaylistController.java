@@ -64,7 +64,7 @@ public class PlaylistController {
     public List<Playlist> getMiePlaylistCondivise() {
         Utente u = sessionCtrl.getUtenteLoggato();
         if (u == null) return new ArrayList<>();
-        return playlistDao.listaPlaylistInCondivisioneConMe(u);
+        return playlistDao.listaPlaylistInCondivisioneConMeDaMe(u);
     }
 
     // =========================================================================
