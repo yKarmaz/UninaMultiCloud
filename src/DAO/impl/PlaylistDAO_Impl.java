@@ -379,7 +379,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	}
 
 	@Override
-	public ArrayList<Playlist> listaPlaylistInCondivisioneConMe(Utente utente) {
+	public ArrayList<Playlist> listaPlaylistInCondivisioneConMeDaMe(Utente utente) {
 		
 		ArrayList<Playlist> listaPlaylist = new ArrayList<>();
 		String query = "SELECT * FROM accesso_o_modifica WHERE id_utente = ?";
@@ -400,14 +400,39 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 				}
 			}
 			
-			return listaPlaylist;
+			
 			
 		}catch(SQLException e)
 		{
 			System.out.println("Errore nel recupero delle playlist ");
 			e.printStackTrace();
 		}
-		return null;
+		query = "SELECT p.id_playlist FROM playlist_condivisa pc JOIN playlist p ON pc.id_playlist = p.id_playlist WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, utente.getIdUtente());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				while(rs.next())
+				{
+					int idPlaylist = rs.getInt(1);
+					Playlist supporto = new PlaylistCondivisa(idPlaylist, null, null);
+					Playlist playlistCompleta = trovaPlaylist(supporto);
+					if(playlistCompleta != null)
+					{
+						listaPlaylist.add(playlistCompleta);
+					}
+				}
+			}
+			
+			
+			
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero delle playlist ");
+			e.printStackTrace();
+		}
+		return listaPlaylist;
 	}
 
 
