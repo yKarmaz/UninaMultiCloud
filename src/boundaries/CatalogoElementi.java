@@ -2,34 +2,34 @@ package boundaries;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
+import java.awt.*;
+import java.util.List;
 import controllers.MediaController;
 import controllers.PlaylistController;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-// import entities.ElementoMultimediale; // ⚠️ IN FUTURO: Ti servirà per la lista reale
+import entities.ElementoMultimediale;
+import entities.Audio;
 
 public class CatalogoElementi extends JPanel {
-
     private MediaController mediaController;
-    private PlaylistController playlistController; // Serve da passare alla PaginaElemento
+    private PlaylistController playlistController;
     private HomePage homePage;
 
     private JTextField txtRicerca;
     private JTable tabellaElementi;
     private DefaultTableModel modelloTabella;
+    
+    // LA LISTA VERA IN RAM
+    private List<ElementoMultimediale> listaRisultati;
 
-    public CatalogoElementi(MediaController mediaController, PlaylistController playlistController, HomePage homePage) {
-        this.mediaController = mediaController;
-        this.playlistController = playlistController;
+    public CatalogoElementi(MediaController mediaCtrl, PlaylistController playCtrl, HomePage homePage) {
+        this.mediaController = mediaCtrl;
+        this.playlistController = playCtrl;
         this.homePage = homePage;
         
         inizializzaInterfaccia();
         
-        // Al primo avvio mostriamo tutto il catalogo finto
-        popolaTabella(mediaController.cercaBrani("")); 
+        // Al primo avvio carica tutto il catalogo
+        eseguiRicerca(""); 
     }
 
     private void inizializzaInterfaccia() {
@@ -47,7 +47,7 @@ public class CatalogoElementi extends JPanel {
         pnlTitolo.add(lblTitolo, BorderLayout.CENTER);
 
         JPanel pnlRicerca = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        pnlRicerca.add(new JLabel("Cerca Autore o Titolo: "));
+        pnlRicerca.add(new JLabel("Cerca Titolo: "));
         txtRicerca = new JTextField(20);
         JButton btnFiltra = new JButton("Filtra");
         pnlRicerca.add(txtRicerca);
@@ -66,10 +66,9 @@ public class CatalogoElementi extends JPanel {
         tabellaElementi = new JTable(modelloTabella);
         tabellaElementi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabellaElementi.setRowHeight(25);
-        
         add(new JScrollPane(tabellaElementi), BorderLayout.CENTER);
 
-        // --- 3. FOOTER (Tasto Apri) ---
+        // --- 3. FOOTER ---
         JPanel pnlFooter = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnApri = new JButton("Vedi Dettagli Elemento");
         btnApri.setBackground(new Color(52, 152, 219));
@@ -77,17 +76,16 @@ public class CatalogoElementi extends JPanel {
         pnlFooter.add(btnApri);
         add(pnlFooter, BorderLayout.SOUTH);
 
-        // ==========================================
-        // EVENTI
-        // ==========================================
-
-        btnIndietro.addActionListener(e -> homePage.cambiaPannelloCentrale(new JPanel()));
+        // --- 4. EVENTI ---
+        
+        btnIndietro.addActionListener(e -> {
+            // Torna alla schermata vuota della Dashboard
+            homePage.cambiaPannelloCentrale(new JPanel());
+        });
 
         btnFiltra.addActionListener(e -> {
-            String testo = txtRicerca.getText().trim();
-            // Deleghiamo la ricerca al Controller
-            // ⚠️ IN FUTURO: mediaController.cercaBrani(testo) ti restituirà una List<ElementoMultimediale> vera
-            popolaTabella(null); // Passo null per ora perché stiamo simulando
+            // Lancia la ricerca passando il testo
+            eseguiRicerca(txtRicerca.getText().trim());
         });
 
         btnApri.addActionListener(e -> {
@@ -96,24 +94,24 @@ public class CatalogoElementi extends JPanel {
                 JOptionPane.showMessageDialog(this, "Seleziona un elemento!", "Attenzione", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            String titoloSelezionato = (String) modelloTabella.getValueAt(riga, 0);
-
-            // ⚠️ IN FUTURO: Recupererai l'OGGETTO ElementoMultimediale vero per passarlo alla view successiva.
-            // ElementoMultimediale el = listaRisultati.get(riga);
             
-            PaginaElemento dettaglio = new PaginaElemento(mediaController, playlistController, homePage, titoloSelezionato, this);
-            homePage.cambiaPannelloCentrale(dettaglio);
+            // MAGIA: Prendi l'oggetto vero e passalo a PaginaElemento
+            ElementoMultimediale elSelezionato = listaRisultati.get(riga);
+            homePage.cambiaPannelloCentrale(new PaginaElemento(mediaController, playlistController, homePage, elSelezionato, this));
         });
     }
 
-    // ⚠️ IN FUTURO: Il parametro sarà List<ElementoMultimediale> risultati
-    private void popolaTabella(Object fakeParam) {
-        modelloTabella.setRowCount(0); // Svuota la tabella precedente
+    private void eseguiRicerca(String testo) {
+        modelloTabella.setRowCount(0); // Svuota i vecchi risultati
         
-        // Dati finti per provare la grafica
-        modelloTabella.addRow(new Object[]{"Bohemian Rhapsody", "Queen", "Audio"});
-        modelloTabella.addRow(new Object[]{"Thriller", "Michael Jackson", "Audio"});
-        modelloTabella.addRow(new Object[]{"Concerto Live 2026", "Vasco Rossi", "Video"});
+        // Uso lo stesso metodo di PaginaFiltraggio fissando il tipo su "Tutti"
+        this.listaRisultati = mediaController.filtraElementi(testo, "Tutti");
+        
+        for(ElementoMultimediale el : listaRisultati) {
+            String tipo = (el instanceof Audio) ? "Audio" : "Video";
+            String autore = (el.getProprietario() != null) ? el.getProprietario().getUsername() : "Sconosciuto";
+            
+            modelloTabella.addRow(new Object[]{el.getTitolo(), autore, tipo});
+        }
     }
 }

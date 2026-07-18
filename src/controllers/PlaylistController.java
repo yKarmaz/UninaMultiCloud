@@ -11,10 +11,10 @@ import entities.Playlist;
 import entities.PlaylistPrivata;
 import entities.PlaylistPubblica;
 import entities.PlaylistCondivisa;
+import entities.ElementoMultimediale;
 import entities.Utente;
 
 public class PlaylistController {
-    
     private PlaylistDao playlistDao;
     private SessionController sessionCtrl;
 
@@ -34,8 +34,6 @@ public class PlaylistController {
         if (proprietario == null) return false;
 
         Playlist nuovaPlaylist;
-        
-        // Smisto le Entity in base alla tendina della grafica
         switch (tipo) {
             case "Pubblica":
                 nuovaPlaylist = new PlaylistPubblica(0, nome, proprietario, categoria);
@@ -48,19 +46,43 @@ public class PlaylistController {
                 break;
         }
 
-        // Chiamo il DAO del tuo compagno
         Playlist salvata = playlistDao.salvaPlaylist(nuovaPlaylist);
-        return salvata != null; 
+        return salvata != null;
     }
 
-    // ⚠️ STUB: Metodi per popolare le tabelle del CatalogoPlaylist
     public List<Playlist> getMiePlaylistPrivate() {
-        return playlistDao.trovaPlaylistPrivateUtente(sessionCtrl.getUtenteLoggato().getIdUtente());
-        
+        Utente u = sessionCtrl.getUtenteLoggato();
+        if (u == null) return new ArrayList<>();
+        return playlistDao.trovaPlaylistPrivateUtente(u.getIdUtente());
     }
 
     public List<Playlist> getPlaylistPubbliche() {
         return playlistDao.trovaTutteLePubbliche();
+    }
+    
+    public List<Playlist> getMiePlaylistCondivise() {
+        Utente u = sessionCtrl.getUtenteLoggato();
+        if (u == null) return new ArrayList<>();
+        return playlistDao.listaPlaylistInCondivisioneConMe(u);
+    }
+
+    // =========================================================================
+    // I 2 METODI SOTTO RICHIEDONO CHE IL TUO COMPAGNO AGGIORNI IL PLAYLIST_DAO
+    // =========================================================================
+
+    public boolean aggiungiElementoAPlaylist(Playlist p, ElementoMultimediale el) {
+        // Quando il DAO sarà pronto, dovrai scommentare questa riga:
+        // return playlistDao.aggiungiBrano(p.getID(), el.getIdElemento());
         
+        System.err.println("ERRORE: Impossibile aggiungere. Fai creare al tuo compagno il metodo 'aggiungiBrano' nel DAO!");
+        return false;
+    }
+
+    public List<ElementoMultimediale> getBraniPlaylist(Playlist p) {
+        // Quando il DAO sarà pronto, dovrai scommentare questa riga:
+        // return playlistDao.estraiBraniDaPlaylist(p.getID());
+        
+        System.err.println("ERRORE: Impossibile leggere i brani. Fai creare al tuo compagno il metodo 'estraiBraniDaPlaylist' nel DAO!");
+        return new ArrayList<>(); // Ritorna vuoto per non far crashare la GUI
     }
 }

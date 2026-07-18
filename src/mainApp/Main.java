@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import databaseConnection.DBConnection;
 import entities.*;
 import DAO.*;
@@ -14,7 +16,22 @@ import boundaries.*;
 public class Main {
 
     public static void main(String[] args) {
+    	
+    	
         System.out.println("Avvio dell'applicazione UninaMultiCloud...");
+        
+        // Deleghiamo l'avvio della grafica al thread corretto (Event Dispatch Thread)
+        SwingUtilities.invokeLater(() -> {
+            
+            // 1. Accendiamo il "cervello" iniziale: il SessionController
+            SessionController sessionController = new SessionController();
+            
+            // 2. Chiediamo al controller di mostrare la prima Boundary (il Login)
+            sessionController.mostraFinestraLogin();
+            
+        });
+        
+        /*System.out.println("Avvio dell'applicazione UninaMultiCloud...");
 
         /* 
         // =========================================================================
@@ -38,7 +55,7 @@ public class Main {
         // =========================================================================
         // TEST DAO PLAYLIST
         // =========================================================================
-        try (Connection conn = DBConnection.getInstance().getConnection()) {
+        /*try (Connection conn = DBConnection.getInstance().getConnection()) {
             
             System.out.println("--- Connessione al DB stabilita con successo! ---\n");
             
@@ -219,10 +236,13 @@ public class Main {
             */
             
             
-            
+        /*    
         } catch (SQLException e) {
             System.err.println("Errore di connessione o esecuzione SQL durante il test:");
             e.printStackTrace();
         }
+        
+        */
+        
     }
 }

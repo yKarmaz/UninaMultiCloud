@@ -3,113 +3,78 @@ package boundaries;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import controllers.MediaController;
-import controllers.PlaylistController;
+import java.util.List;
+import controllers.*;
+import entities.*;
 
 public class PaginaPlaylist extends JPanel {
-
     private PlaylistController playlistController;
-    // ⚠️ IN FUTURO: Aggiungi il MediaController qui per poter avviare la riproduzione
     private MediaController mediaController;
-    private JPanel homePage;
+    private HomePage homePage;
+    
+    private Playlist playlistCorrente; // L'oggetto reale
+    private JPanel pannelloPrecedente;
     
     private JTable tabellaBrani;
     private DefaultTableModel modelloTabella;
+    private List<ElementoMultimediale> listaBraniReali;
 
-    public PaginaPlaylist(PlaylistController playCtrl, MediaController mediaCtrl, JPanel home) {
+    public PaginaPlaylist(PlaylistController playCtrl, MediaController mediaCtrl, HomePage home, Playlist p, JPanel prev) {
         this.playlistController = playCtrl;
-        this.mediaController = mediaCtrl; 
+        this.mediaController = mediaCtrl;
         this.homePage = home;
+        this.playlistCorrente = p;
+        this.pannelloPrecedente = prev;
         
         inizializzaInterfaccia();
-        popolaTabellaConDatiFake(); 
+        caricaBraniDalDB();
     }
 
     private void inizializzaInterfaccia() {
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- 1. HEADER (Strutturato su due righe) ---
-        JPanel pnlHeader = new JPanel();
-        pnlHeader.setLayout(new BoxLayout(pnlHeader, BoxLayout.Y_AXIS));
-        
-        // Riga 1: Tasto Indietro
-        JPanel pnlBack = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel pnlHeader = new JPanel(new BorderLayout());
         JButton btnIndietro = new JButton("< Indietro");
-        pnlBack.add(btnIndietro);
+        JLabel lblTitolo = new JLabel("Playlist: " + playlistCorrente.getNome(), SwingConstants.CENTER);
+        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 24));
         
-        // Riga 2: Titolo centrato
-        JLabel lblTitolo = new JLabel("La Mia Playlist", SwingConstants.CENTER);
-        lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
-        lblTitolo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblTitolo.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
-        
-        pnlHeader.add(pnlBack);
-        pnlHeader.add(lblTitolo);
+        pnlHeader.add(btnIndietro, BorderLayout.WEST);
+        pnlHeader.add(lblTitolo, BorderLayout.CENTER);
         add(pnlHeader, BorderLayout.NORTH);
 
-        // --- 2. TABELLA (Centro) ---
-        String[] colonne = {"Titolo", "Autore", "Durata", "Tipo"};
+        String[] colonne = {"Titolo", "Tipologia", "Durata"};
         modelloTabella = new DefaultTableModel(colonne, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) { return false; }
+            public boolean isCellEditable(int r, int c) { return false; }
         };
         tabellaBrani = new JTable(modelloTabella);
-        tabellaBrani.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabellaBrani.setRowHeight(25);
-        
         add(new JScrollPane(tabellaBrani), BorderLayout.CENTER);
 
-        // --- 3. FOOTER (Tasto Riproduci) ---
-        JPanel pnlFooter = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnRiproduci = new JButton("Apri Brano Selezionato");
-        btnRiproduci.setBackground(new Color(52, 152, 219));
-        btnRiproduci.setForeground(Color.WHITE);
-        btnRiproduci.setFont(new Font("Tahoma", Font.BOLD, 14));
-        pnlFooter.add(btnRiproduci);
-        
-        add(pnlFooter, BorderLayout.SOUTH);
+        JButton btnApri = new JButton("Apri Brano Selezionato");
+        add(btnApri, BorderLayout.SOUTH);
 
-        // ==========================================
-        // 4. EVENTI
-        // ==========================================
+        btnIndietro.addActionListener(e -> homePage.cambiaPannelloCentrale(pannelloPrecedente));
 
-        btnIndietro.addActionListener(e -> {
-            System.out.println("Torno indietro al Catalogo Playlist...");
-            // homePage.cambiaPannelloCentrale(new CatalogoPlaylist(playlistController, homePage));
-        });
-
-        btnRiproduci.addActionListener(e -> {
-            int rigaSelezionata = tabellaBrani.getSelectedRow();
-            if (rigaSelezionata == -1) {
-                JOptionPane.showMessageDialog(PaginaPlaylist.this, 
-                    "Seleziona prima un brano dalla lista!", "Errore", JOptionPane.WARNING_MESSAGE);
+        btnApri.addActionListener(e -> {
+            int riga = tabellaBrani.getSelectedRow();
+            if (riga == -1) {
+                JOptionPane.showMessageDialog(this, "Seleziona un brano!");
                 return;
             }
-
-            String titoloSelezionato = (String) modelloTabella.getValueAt(rigaSelezionata, 0);
-            
-            // ⚠️ IN FUTURO: DELEGA L'APERTURA. Passiamo 'this' come pannello precedente!
-            // PaginaElemento dettaglio = new PaginaElemento(mediaController, playlistController, homePage, elementoReale, this);
-            // homePage.cambiaPannelloCentrale(dettaglio);
-            
-            // LOGICA FAKE PER TEST
-            PaginaElemento vistaDettaglio = new PaginaElemento(mediaController, playlistController, homePage, titoloSelezionato, this);
-            
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            topFrame.getContentPane().removeAll();
-            topFrame.getContentPane().add(vistaDettaglio);
-            topFrame.revalidate();
-            topFrame.repaint();
+            ElementoMultimediale el = listaBraniReali.get(riga);
+            // Salto alla pagina del singolo elemento, passando this come precedente
+            homePage.cambiaPannelloCentrale(new PaginaElemento(mediaController, playlistController, homePage, el, this));
         });
     }
 
-    private void popolaTabellaConDatiFake() {
-        modelloTabella.addRow(new Object[]{"Bohemian Rhapsody", "Queen", "05:55", "Audio"});
-        modelloTabella.addRow(new Object[]{"Stairway to Heaven", "Led Zeppelin", "08:02", "Audio"});
-        modelloTabella.addRow(new Object[]{"Live at Wembley", "Queen", "1:50:00", "Video"});
+    private void caricaBraniDalDB() {
+        modelloTabella.setRowCount(0);
+        // Richiesta reale al controller: Dammi i brani di QUESTA playlist
+        listaBraniReali = playlistController.getBraniPlaylist(playlistCorrente);
+        
+        for(ElementoMultimediale el : listaBraniReali) {
+            String tipo = (el instanceof Audio) ? "Audio" : "Video";
+            modelloTabella.addRow(new Object[]{el.getTitolo(), tipo, el.getDurata()});
+        }
     }
 }
