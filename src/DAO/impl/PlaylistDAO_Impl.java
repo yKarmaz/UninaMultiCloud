@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import DAO.PlaylistDao;
 import DAO.UtenteDao;
+import DAO.ElementoMultimedialeDao;
 import entities.*;
 
 public class PlaylistDAO_Impl implements PlaylistDao{
@@ -471,7 +472,63 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		}
 		return null;
 	}
-	
+
+
+	@Override
+	public boolean aggiungiBrano(Playlist playlist, ElementoMultimediale elemento) {
+		String query = "INSERT INTO Contiene(id_elemento, id_playlist) VALUES (?, ?)";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, elemento.getIdElemento());
+			statement.setInt(2, playlist.getID());
+			int rowsAffected = statement.executeUpdate();
+			if(rowsAffected > 0)
+			{
+				playlist.addElemento(elemento);
+				return true;
+			}
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nell'inserimento del brano nella playlist");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+
+	@Override
+	public ArrayList<ElementoMultimediale> estraiBraniDaPlaylist(Playlist playlist) {
+	    ArrayList<ElementoMultimediale> listaBraniDaPlaylist = new ArrayList<>();
+	    
+	    // Cambiamo la query per selezionare solo gli ID dei brani associati alla playlist
+	    String query = "SELECT id_elemento FROM Contiene WHERE id_playlist = ?";
+	                   
+	    try (PreparedStatement statement = connessione.prepareStatement(query)) {
+	        statement.setInt(1, playlist.getID());
+	        
+	        try (ResultSet rs = statement.executeQuery()) {
+	            // Istanziato il DAO degli elementi multimediali usando la sua implementazione
+	            // (Assicurati che il nome della classe sia ElementoMultimedialeDAO_Impl o simile)
+	            ElementoMultimedialeDao elementoDao = new ElementoMultimedialeDAO_Impl(connessione);
+	            
+	            while (rs.next()) {
+	                int idElemento = rs.getInt("id_elemento");
+	                
+	                // Deleghiamo il caricamento e il mapping dell'oggetto intero al metodo dell'interfaccia
+	                ElementoMultimediale el = elementoDao.trovaContenutoDalD(idElemento);
+	                
+	                if (el != null) {
+	                    listaBraniDaPlaylist.add(el);
+	                }
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Errore durante l'estrazione dei brani dalla playlist: " + playlist.getNome());
+	        e.printStackTrace();
+	    }
+	    
+	    return listaBraniDaPlaylist; 
+	}
 	
 	
 }

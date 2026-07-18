@@ -33,7 +33,12 @@ public class SessionController {
         Utente utenteTrovato = this.utenteDAO.trovaUtente(username, password);
         
         if (utenteTrovato != null) {
-            this.utenteLoggato = utenteTrovato;
+            
+        	this.utenteLoggato = utenteTrovato;
+            
+        	System.out.println("[DEBUG LOGIN] Utente loggato dal DB - Username: " 
+                    + utenteTrovato.getUsername() + " | ID reale su DB: " + utenteTrovato.getIdUtente());
+            
             this.paginaLogin.dispose(); // Chiude il login
             
             // Inizializza i controller di business passandogli la sessione

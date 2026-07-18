@@ -56,9 +56,11 @@ public class MediaController {
     }
     
     public void registraFruizione(ElementoMultimediale el) {
-        Utente u = sessionCtrl.getUtenteLoggato();
+        Utente u = sessionCtrl.getUtenteLoggato();	
+        System.out.println("DEBUG INSERIMENTO DI FRUIZIONE: ID Utente: " + u.getIdUtente());
+        System.out.println("DEBUG INSERIMENTO DI FRUIZIONE: ID Elemento: " + el.getIdElemento());
         if(u != null) {
-            Fruizione f = new Fruizione(u.getIdUtente(), el.getIdElemento(), LocalDateTime.now());
+            Fruizione f = new Fruizione(el.getIdElemento(), u.getIdUtente(), LocalDateTime.now());
             fruizioneDao.SalvaFruizione(f);
             System.out.println("Fruizione registrata nel database per il brano: " + el.getTitolo());
         }

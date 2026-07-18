@@ -71,18 +71,15 @@ public class PlaylistController {
     // =========================================================================
 
     public boolean aggiungiElementoAPlaylist(Playlist p, ElementoMultimediale el) {
-        // Quando il DAO sarà pronto, dovrai scommentare questa riga:
-        // return playlistDao.aggiungiBrano(p.getID(), el.getIdElemento());
+       
+        return playlistDao.aggiungiBrano(p, el);
         
-        System.err.println("ERRORE: Impossibile aggiungere. Fai creare al tuo compagno il metodo 'aggiungiBrano' nel DAO!");
-        return false;
     }
 
     public List<ElementoMultimediale> getBraniPlaylist(Playlist p) {
         // Quando il DAO sarà pronto, dovrai scommentare questa riga:
-        // return playlistDao.estraiBraniDaPlaylist(p.getID());
+        return playlistDao.estraiBraniDaPlaylist(p);
         
-        System.err.println("ERRORE: Impossibile leggere i brani. Fai creare al tuo compagno il metodo 'estraiBraniDaPlaylist' nel DAO!");
-        return new ArrayList<>(); // Ritorna vuoto per non far crashare la GUI
+        
     }
 }

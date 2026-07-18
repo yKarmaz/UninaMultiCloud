@@ -3,6 +3,7 @@ package DAO;
 
 import java.util.ArrayList;
 
+import entities.ElementoMultimediale;
 import entities.Playlist;
 import entities.Utente;
 
@@ -23,4 +24,8 @@ public interface PlaylistDao {
 	ArrayList<Playlist> trovaTutteLePubbliche();
 	
 	ArrayList<Playlist> trovaPlaylistPrivateUtente(int idUtente);
+	
+	ArrayList<ElementoMultimediale> estraiBraniDaPlaylist(Playlist playlist);
+	
+	boolean aggiungiBrano(Playlist playlist, ElementoMultimediale elemento);
 }

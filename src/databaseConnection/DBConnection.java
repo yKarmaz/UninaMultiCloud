@@ -11,7 +11,7 @@ public class DBConnection {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/UninaMultiCloud";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "murogiallo";
+    private static final String PASSWORD = "AleDell2006!";
 
     private DBConnection() {
         try {
