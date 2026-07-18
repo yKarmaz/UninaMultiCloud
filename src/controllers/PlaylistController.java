@@ -79,8 +79,25 @@ public class PlaylistController {
 
     public List<ElementoMultimediale> getBraniPlaylist(Playlist p) {
         // Quando il DAO sarà pronto, dovrai scommentare questa riga:
-        return playlistDao.estraiBraniDaPlaylist(p);
+        return playlistDao.estraiBraniDaPlaylist(p); 
+    }
+    
+    public List<Playlist> getMiePlaylistPubbliche() {
+        Utente u = sessionCtrl.getUtenteLoggato();
+        if (u == null) return new ArrayList<>();
         
+        // Chiediamo al DAO TUTTE le playlist di questo utente
+        List<Playlist> tutteLeMie = playlistDao.listaPlaylistProprie(u);
+        List<Playlist> soloMiePubbliche = new ArrayList<>();
         
+        // Filtriamo tenendo solo quelle che sono istanza di PlaylistPubblica
+        if (tutteLeMie != null) {
+            for(Playlist p : tutteLeMie) {
+                if(p instanceof PlaylistPubblica) {
+                    soloMiePubbliche.add(p);
+                }
+            }
+        }
+        return soloMiePubbliche;
     }
 }

@@ -339,48 +339,56 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 
 	@Override
 	public ArrayList<Playlist> listaPlaylistProprie(Utente utente) {
-	    
 	    ArrayList<Playlist> listaPlaylist = new ArrayList<>();
-	    String query = "SELECT id_playlist FROM Playlist WHERE id_utente = ?";
 	    
+	    // Controllo di sicurezza iniziale
+	    if (utente == null) {
+	        return listaPlaylist;
+	    }
+
+	    // UNICA QUERY EFFICIENTE: Estrae le playlist e decide il tipo tramite le LEFT JOIN
+	    String query = "SELECT p.ID_Playlist, p.nome, "
+	                 + "pub.numvisualizzazioni, "
+	                 + "cond.URL_Invito, "
+	                 + "priv.ID_Playlist AS is_privata "
+	                 + "FROM Playlist p "
+	                 + "LEFT JOIN Playlist_Pubblica pub ON p.ID_Playlist = pub.ID_Playlist "
+	                 + "LEFT JOIN Playlist_Condivisa cond ON p.ID_Playlist = cond.ID_Playlist "
+	                 + "LEFT JOIN Playlist_privata priv ON p.ID_Playlist = priv.ID_Playlist "
+	                 + "WHERE p.ID_Utente = ?";
+
 	    try (PreparedStatement statement = connessione.prepareStatement(query)) {
 	        statement.setInt(1, utente.getIdUtente());
 	        
-	        // 1. Usiamo executeQuery() direttamente dentro il try-with-resources per sicurezza
 	        try (ResultSet rs = statement.executeQuery()) {
-	            
-	            // 2. Ciclo while standard per scorrere tutte le playlist trovate
 	            while (rs.next()) {
-	                int idPlaylist = rs.getInt("id_playlist");
-	                
-	                // 3. Creiamo un'istanza fittizia di supporto con il solo ID (usando una sottoclasse qualsiasi, es. Privata)
-	                // oppure una classe base se Playlist non è astratta.
-	                Playlist supporto = new PlaylistPrivata(idPlaylist, null, null); 
-	                
-	                // 4. Deleghiamo al tuo trovaPlaylist il compito di caricarla dal DB 
-	                // con la sua vera identità (Pubblica, Privata o Condivisa)
-	                Playlist playlistCompleta = trovaPlaylist(supporto);
-	                
-	                if (playlistCompleta != null) {
-	                    listaPlaylist.add(playlistCompleta);
+	                int idPlaylist = rs.getInt("ID_Playlist");
+	                String nomePlaylist = rs.getString("nome");
+
+	                // Leggiamo i risultati della JOIN per istanziare l'oggetto corretto
+	                // Usiamo l'oggetto 'utente' che abbiamo già, senza rifare la query!
+	                if (rs.getObject("numvisualizzazioni") != null) {
+	                    listaPlaylist.add(new PlaylistPubblica(idPlaylist, nomePlaylist, utente, "Generica"));
+	                } 
+	                else if (rs.getObject("URL_Invito") != null) {
+	                    listaPlaylist.add(new PlaylistCondivisa(idPlaylist, nomePlaylist, utente));
+	                } 
+	                else {
+	                    listaPlaylist.add(new PlaylistPrivata(idPlaylist, nomePlaylist, utente));
 	                }
 	            }
 	        }
-	        
-	        // Restituiamo la lista (vuota se l'utente non ha playlist, ma non null)
-	        return listaPlaylist;
-	        
 	    } catch (SQLException e) {
 	        System.err.println("Errore nel recupero delle playlist dell'utente: " + utente.getIdUtente());
 	        e.printStackTrace();
 	    }
 	    
-	    return null;
+	    return listaPlaylist;
 	}
 
 	@Override
 	public ArrayList<Playlist> listaPlaylistInCondivisioneConMe(Utente utente) {
-		
+
 		ArrayList<Playlist> listaPlaylist = new ArrayList<>();
 		String query = "SELECT * FROM accesso_o_modifica WHERE id_utente = ?";
 		try(PreparedStatement statement = connessione.prepareStatement(query))

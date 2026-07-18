@@ -28,7 +28,7 @@ public class CaricaElemento extends JPanel {
         lblTitoloView.setFont(new Font("Tahoma", Font.BOLD, 26));
         add(lblTitoloView, BorderLayout.NORTH);
 
-        // IL TRUCCO È QUI: Creiamo il form e lo confiniamo in alto (NORTH)
+        //Creiamo il form e lo confiniamo in alto (NORTH)
         JPanel pnlFormWrapper = new JPanel(new BorderLayout());
         JPanel pnlForm = new JPanel(new GridLayout(4, 2, 10, 20));
         

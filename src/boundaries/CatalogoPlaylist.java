@@ -81,11 +81,13 @@ public class CatalogoPlaylist extends JPanel {
         modPriv.setRowCount(0);
         for(Playlist p : listPrivate) modPriv.addRow(new Object[]{p.getNome(), p.getProprietario().getUsername()});
 
-        // Popola Pubbliche
-        listPubbliche = playlistController.getPlaylistPubbliche();
+     // Popola Pubbliche (SOLO LE TUE)
+        listPubbliche = playlistController.getMiePlaylistPubbliche(); // <-- Usa il nuovo metodo!
         DefaultTableModel modPub = (DefaultTableModel) tabellaPubbliche.getModel();
         modPub.setRowCount(0);
-        for(Playlist p : listPubbliche) modPub.addRow(new Object[]{p.getNome(), p.getProprietario().getUsername()});
+        for(Playlist p : listPubbliche) {
+            modPub.addRow(new Object[]{p.getNome(), p.getProprietario().getUsername()});
+        }
 
         // Popola Condivise
         listCondivise = playlistController.getMiePlaylistCondivise();

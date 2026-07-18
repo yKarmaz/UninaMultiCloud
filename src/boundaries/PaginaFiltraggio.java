@@ -16,7 +16,6 @@ public class PaginaFiltraggio extends JPanel {
     private JTable tabellaElementi;
     private DefaultTableModel modelloTabella;
     
-    // FONDAMENTALE: Lista reale degli elementi in memoria
     private List<ElementoMultimediale> listaRisultati;
 
     public PaginaFiltraggio(MediaController mediaCtrl, PlaylistController playCtrl, HomePage home) {
@@ -24,7 +23,7 @@ public class PaginaFiltraggio extends JPanel {
         this.playlistController = playCtrl;
         this.homePage = home;
         inizializzaInterfaccia();
-        eseguiRicerca("", "Tutti"); // Carica tutto all'inizio
+        eseguiRicerca("", "Tutti");
     }
 
     private void inizializzaInterfaccia() {
@@ -35,10 +34,20 @@ public class PaginaFiltraggio extends JPanel {
         pnlFiltri.add(new JLabel("Titolo:"));
         txtTitolo = new JTextField(15);
         pnlFiltri.add(txtTitolo);
+        
         comboTipo = new JComboBox<>(new String[]{"Tutti", "Audio", "Video"});
         pnlFiltri.add(comboTipo);
+        
         JButton btnCerca = new JButton("Cerca");
         pnlFiltri.add(btnCerca);
+        
+        // BOTTONE: Esplora Playlist Pubbliche
+        JButton btnPlaylistPubbliche = new JButton("Esplora Playlist");
+        btnPlaylistPubbliche.setBackground(new Color(46, 204, 113));
+        btnPlaylistPubbliche.setForeground(Color.WHITE);
+        pnlFiltri.add(Box.createHorizontalStrut(20));
+        pnlFiltri.add(btnPlaylistPubbliche);
+
         add(pnlFiltri, BorderLayout.NORTH);
 
         String[] colonne = {"Titolo", "Autore", "Tipologia"};
@@ -51,7 +60,16 @@ public class PaginaFiltraggio extends JPanel {
         JButton btnApriElemento = new JButton("Apri Selezionato");
         add(btnApriElemento, BorderLayout.SOUTH);
 
+        // ==========================================
+        // EVENTI (QUI E' DOVE VA MESSO IL CODICE)
+        // ==========================================
+        
         btnCerca.addActionListener(e -> eseguiRicerca(txtTitolo.getText().trim(), (String) comboTipo.getSelectedItem()));
+
+        // ECCO IL SALTO ALLA NUOVA VISTA DELLE PLAYLIST PUBBLICHE
+        btnPlaylistPubbliche.addActionListener(e -> {
+            homePage.cambiaPannelloCentrale(new CatalogoPubbliche(playlistController, mediaController, homePage));
+        });
 
         btnApriElemento.addActionListener(e -> {
             int riga = tabellaElementi.getSelectedRow();
@@ -59,7 +77,6 @@ public class PaginaFiltraggio extends JPanel {
                 JOptionPane.showMessageDialog(this, "Seleziona un elemento!");
                 return;
             }
-            // Estraggo l'OGGETTO REALE e lo passo alla pagina di dettaglio, passando "this" per poter tornare indietro
             ElementoMultimediale elSelezionato = listaRisultati.get(riga);
             homePage.cambiaPannelloCentrale(new PaginaElemento(mediaController, playlistController, homePage, elSelezionato, this));
         });
@@ -67,7 +84,6 @@ public class PaginaFiltraggio extends JPanel {
 
     private void eseguiRicerca(String filtroTesto, String filtroTipo) {
         modelloTabella.setRowCount(0);
-        // Chiamata vera al DB tramite Controller
         this.listaRisultati = mediaController.filtraElementi(filtroTesto, filtroTipo);
         
         for(ElementoMultimediale el : listaRisultati) {
