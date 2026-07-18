@@ -18,6 +18,7 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao {
     public ElementoMultimedialeDAO_Impl(Connection connessione) {
         this.connessione = connessione;
     }
+  //commento
 
     @Override
     public int salvaContenuto(ElementoMultimediale e) {
