@@ -52,10 +52,10 @@ public class SessionController {
             this.paginaLogin.dispose();
             
             // 3. Inizializzo i controller secondari se necessario
-            // MediaController mediaCtrl = new MediaController();
-            // PlaylistController playlistCtrl = new PlaylistController();
-            // ReportController reportCtrl = new ReportController();
-
+            MediaController mediaCtrl = new MediaController(this);
+            PlaylistController playlistCtrl = new PlaylistController(this);
+            //ReportController reportCtrl = new ReportController(this); devo ancora fare il report controller
+            
             // 4. Istanzio la HomePage e la mostro
             // HomePage home = new HomePage(this, mediaCtrl, playlistCtrl, reportCtrl);
             // home.setVisible(true);

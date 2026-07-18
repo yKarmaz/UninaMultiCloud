@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import controllers.*;
 public class HomePage extends JFrame {
 
     // Il controller principale per il logout e per avere i dati dell'utente

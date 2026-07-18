@@ -1,6 +1,10 @@
 package DAO;
 
+
+import java.util.ArrayList;
+
 import entities.Playlist;
+import entities.Utente;
 
 public interface PlaylistDao {
 	
@@ -11,4 +15,12 @@ public interface PlaylistDao {
 	boolean modificaPlaylist(Playlist playlist);
 	
 	boolean cancellaPlaylist(Playlist playlist);
+	
+	ArrayList<Playlist> listaPlaylistProprie(Utente utente);
+	
+	ArrayList<Playlist> listaPlaylistInCondivisioneConMe(Utente utente);
+	
+	ArrayList<Playlist> trovaTutteLePubbliche();
+	
+	ArrayList<Playlist> trovaPlaylistPrivateUtente(int idUtente);
 }

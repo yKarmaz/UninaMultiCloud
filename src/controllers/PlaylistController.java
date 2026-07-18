@@ -55,12 +55,12 @@ public class PlaylistController {
 
     // ⚠️ STUB: Metodi per popolare le tabelle del CatalogoPlaylist
     public List<Playlist> getMiePlaylistPrivate() {
-        // return playlistDao.trovaPlaylistPrivateUtente(sessionCtrl.getUtenteLoggato().getIdUtente());
-        return new ArrayList<>();
+        return playlistDao.trovaPlaylistPrivateUtente(sessionCtrl.getUtenteLoggato().getIdUtente());
+        
     }
 
     public List<Playlist> getPlaylistPubbliche() {
-        // return playlistDao.trovaTutteLePubbliche();
-        return new ArrayList<>();
+        return playlistDao.trovaTutteLePubbliche();
+        
     }
 }

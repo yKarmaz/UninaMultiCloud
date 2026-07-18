@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import DAO.PlaylistDao;
 import DAO.UtenteDao;
@@ -333,4 +334,144 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    
 	    return false;
 	}
+
+
+	@Override
+	public ArrayList<Playlist> listaPlaylistProprie(Utente utente) {
+	    
+	    ArrayList<Playlist> listaPlaylist = new ArrayList<>();
+	    String query = "SELECT id_playlist FROM Playlist WHERE id_utente = ?";
+	    
+	    try (PreparedStatement statement = connessione.prepareStatement(query)) {
+	        statement.setInt(1, utente.getIdUtente());
+	        
+	        // 1. Usiamo executeQuery() direttamente dentro il try-with-resources per sicurezza
+	        try (ResultSet rs = statement.executeQuery()) {
+	            
+	            // 2. Ciclo while standard per scorrere tutte le playlist trovate
+	            while (rs.next()) {
+	                int idPlaylist = rs.getInt("id_playlist");
+	                
+	                // 3. Creiamo un'istanza fittizia di supporto con il solo ID (usando una sottoclasse qualsiasi, es. Privata)
+	                // oppure una classe base se Playlist non è astratta.
+	                Playlist supporto = new PlaylistPrivata(idPlaylist, null, null); 
+	                
+	                // 4. Deleghiamo al tuo trovaPlaylist il compito di caricarla dal DB 
+	                // con la sua vera identità (Pubblica, Privata o Condivisa)
+	                Playlist playlistCompleta = trovaPlaylist(supporto);
+	                
+	                if (playlistCompleta != null) {
+	                    listaPlaylist.add(playlistCompleta);
+	                }
+	            }
+	        }
+	        
+	        // Restituiamo la lista (vuota se l'utente non ha playlist, ma non null)
+	        return listaPlaylist;
+	        
+	    } catch (SQLException e) {
+	        System.err.println("Errore nel recupero delle playlist dell'utente: " + utente.getIdUtente());
+	        e.printStackTrace();
+	    }
+	    
+	    return null;
+	}
+
+	@Override
+	public ArrayList<Playlist> listaPlaylistInCondivisioneConMe(Utente utente) {
+		
+		ArrayList<Playlist> listaPlaylist = new ArrayList<>();
+		String query = "SELECT * FROM accesso_o_modifica WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, utente.getIdUtente());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				while(rs.next())
+				{
+					int idPlaylist = rs.getInt(2);
+					Playlist supporto = new PlaylistCondivisa(idPlaylist, null, null);
+					Playlist playlistCompleta = trovaPlaylist(supporto);
+					if(playlistCompleta != null)
+					{
+						listaPlaylist.add(playlistCompleta);
+					}
+				}
+			}
+			
+			return listaPlaylist;
+			
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero delle playlist ");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	@Override
+	public ArrayList<Playlist> trovaTutteLePubbliche() {
+		ArrayList<Playlist> playlistPubbliche = new ArrayList<>();
+		String query = "SELECT * FROM playlist_pubblica";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			try(ResultSet rs = statement.executeQuery())
+			{
+				while(rs.next())
+				{
+					int idPlaylist = rs.getInt(1);
+					Playlist supporto = new PlaylistPubblica(idPlaylist, null, null, null);
+					Playlist playlistCompleta = trovaPlaylist(supporto);
+					if(playlistCompleta != null)
+					{
+						playlistPubbliche.add(playlistCompleta);
+					}
+				}
+			}
+			
+			return playlistPubbliche;
+			
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero delle playlist pubbliche");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	@Override
+	public ArrayList<Playlist> trovaPlaylistPrivateUtente(int idUtente) {
+		ArrayList<Playlist> playlistPrivateDiUtente = new ArrayList<>();
+		String query = "SELECT * FROM Playlist_privata pp JOIN Playlist p ON pp.id_Playlist = p.id_playlist WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, idUtente);
+			try(ResultSet rs = statement.executeQuery())
+			{
+				while(rs.next())
+				{
+					int idPlaylist = rs.getInt("id_Playlist");
+					Playlist supporto = new PlaylistPrivata(idPlaylist, null, null);
+					Playlist playlistCompleta = trovaPlaylist(supporto);
+					if(playlistCompleta != null)
+					{
+						playlistPrivateDiUtente.add(playlistCompleta);
+					}
+				}
+			}
+			
+			return playlistPrivateDiUtente;
+			
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero delle playlist private dell'utente");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	
 }
