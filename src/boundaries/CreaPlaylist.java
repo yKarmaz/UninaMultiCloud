@@ -25,7 +25,10 @@ public class CreaPlaylist extends JPanel {
         lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
         add(lblTitolo, BorderLayout.NORTH);
 
+        // WRAPPER PER EVITARE DILATAZIONI
+        JPanel pnlFormWrapper = new JPanel(new BorderLayout());
         JPanel pnlForm = new JPanel(new GridLayout(3, 2, 10, 20));
+        
         pnlForm.add(new JLabel("Nome:"));
         txtNome = new JTextField();
         pnlForm.add(txtNome);
@@ -45,7 +48,8 @@ public class CreaPlaylist extends JPanel {
         comboCategoria.setEnabled(false);
         pnlForm.add(comboCategoria);
 
-        add(pnlForm, BorderLayout.CENTER);
+        pnlFormWrapper.add(pnlForm, BorderLayout.NORTH);
+        add(pnlFormWrapper, BorderLayout.CENTER);
 
         JButton btnCrea = new JButton("Crea Playlist");
         add(btnCrea, BorderLayout.SOUTH);

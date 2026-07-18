@@ -1,7 +1,6 @@
 package boundaries;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import controllers.MediaController;
@@ -29,6 +28,8 @@ public class CaricaElemento extends JPanel {
         lblTitoloView.setFont(new Font("Tahoma", Font.BOLD, 26));
         add(lblTitoloView, BorderLayout.NORTH);
 
+        // IL TRUCCO È QUI: Creiamo il form e lo confiniamo in alto (NORTH)
+        JPanel pnlFormWrapper = new JPanel(new BorderLayout());
         JPanel pnlForm = new JPanel(new GridLayout(4, 2, 10, 20));
         
         pnlForm.add(new JLabel("Titolo:"));
@@ -36,7 +37,8 @@ public class CaricaElemento extends JPanel {
         pnlForm.add(txtTitolo);
 
         pnlForm.add(new JLabel("Descrizione:"));
-        txtDescrizione = new JTextArea();
+        txtDescrizione = new JTextArea(3, 20);
+        txtDescrizione.setLineWrap(true);
         pnlForm.add(new JScrollPane(txtDescrizione));
 
         pnlForm.add(new JLabel("Tipologia:"));
@@ -56,7 +58,9 @@ public class CaricaElemento extends JPanel {
         pnlFile.add(lblPercorsoFile);
         pnlForm.add(pnlFile);
 
-        add(pnlForm, BorderLayout.CENTER);
+        // Aggiungiamo il form al wrapper
+        pnlFormWrapper.add(pnlForm, BorderLayout.NORTH);
+        add(pnlFormWrapper, BorderLayout.CENTER);
 
         JButton btnCarica = new JButton("Carica Contenuto");
         btnCarica.setBackground(new Color(46, 204, 113));
@@ -82,7 +86,7 @@ public class CaricaElemento extends JPanel {
             boolean ok = mediaController.caricaNuovoElemento(txtTitolo.getText().trim(), txtDescrizione.getText(), percorsoFileSelezionato, tipo);
             if(ok) {
                 JOptionPane.showMessageDialog(this, "Caricamento completato!");
-                homePage.cambiaPannelloCentrale(new JPanel()); // Torna alla home vuota
+                homePage.cambiaPannelloCentrale(new JPanel()); 
             } else {
                 JOptionPane.showMessageDialog(this, "Errore nel caricamento.");
             }
