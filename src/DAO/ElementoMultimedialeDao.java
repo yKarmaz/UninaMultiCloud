@@ -3,6 +3,7 @@ package DAO;
 import java.util.List;
 
 import entities.ElementoMultimediale;
+import entities.Utente;
 
 public interface ElementoMultimedialeDao {
 	
@@ -15,5 +16,7 @@ public interface ElementoMultimedialeDao {
 	boolean modificaContenuto(ElementoMultimediale e);
 	
 	boolean cancellaContenuto(ElementoMultimediale e);
+
+	int getSommaVisualizzazioni(Utente u);
 	
 }

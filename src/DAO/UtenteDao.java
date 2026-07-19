@@ -11,4 +11,6 @@ public interface UtenteDao {
 	boolean cancellaUtente(Utente utente);
 
 	Utente trovaUtenteDaID(int ID);
+	
+	int contaContenutiPubblicati(Utente u);
 }

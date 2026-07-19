@@ -11,5 +11,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/chris/OneDrive/Desktop/jfreechart-1.5.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -3,17 +3,20 @@ package boundaries;
 import javax.swing.*;
 import java.awt.*;
 import controllers.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class HomePage extends JFrame {
     private SessionController sessionController;
     private MediaController mediaController;
     private PlaylistController playlistController;
     private JPanel pannelloCentrale;
-
-    public HomePage(SessionController sessionCtrl, MediaController mediaCtrl, PlaylistController playlistCtrl) {
+    private ReportController reportController;
+    public HomePage(SessionController sessionCtrl, MediaController mediaCtrl, PlaylistController playlistCtrl, ReportController reportCtrl) {
         this.sessionController = sessionCtrl;
         this.mediaController = mediaCtrl;
         this.playlistController = playlistCtrl;
+        this.reportController = reportCtrl;
         inizializzaInterfaccia();
     }
 
@@ -22,7 +25,7 @@ public class HomePage extends JFrame {
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         // SIDEBAR
         JPanel sidebar = new JPanel(new GridLayout(7, 1, 10, 15));
@@ -35,6 +38,7 @@ public class HomePage extends JFrame {
         JButton btnCreaPlaylist = new JButton("Crea Playlist");
         JButton btnNuovoElemento = new JButton("Carica Elemento");
         JButton btnReport = new JButton("Report Statistiche");
+        
         JButton btnLogout = new JButton("Logout");
         btnLogout.setForeground(Color.RED);
 
@@ -52,8 +56,8 @@ public class HomePage extends JFrame {
         pnlBenvenuto.add(new JLabel("Benvenuto! Seleziona un'azione dal menu."));
         pannelloCentrale.add(pnlBenvenuto, BorderLayout.CENTER);
 
-        add(sidebar, BorderLayout.WEST);
-        add(pannelloCentrale, BorderLayout.CENTER);
+        getContentPane().add(sidebar, BorderLayout.WEST);
+        getContentPane().add(pannelloCentrale, BorderLayout.CENTER);
 
         // EVENTI MENU
         btnLogout.addActionListener(e -> sessionController.eseguiLogout(this));
@@ -65,6 +69,11 @@ public class HomePage extends JFrame {
         btnCreaPlaylist.addActionListener(e -> cambiaPannelloCentrale(new CreaPlaylist(playlistController, this)));
         
         btnMiePlaylist.addActionListener(e -> cambiaPannelloCentrale(new CatalogoPlaylist(playlistController, mediaController, this)));
+        
+        btnReport.addActionListener(e -> cambiaPannelloCentrale(new ReportPage(reportController, this)));
+        		
+        		
+        	
     }
 
     // IL METODO FONDAMENTALE PER LA NAVIGAZIONE

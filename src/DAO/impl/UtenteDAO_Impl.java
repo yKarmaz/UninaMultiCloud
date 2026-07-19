@@ -139,4 +139,25 @@ public class UtenteDAO_Impl implements UtenteDao{
 		}
 	}
 
+	@Override
+	public int contaContenutiPubblicati(Utente u) {
+		String query = "SELECT COUNT(*) AS Conteggio FROM ContenutiMultimediali WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, u.getIdUtente());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				if(rs.next())
+				{
+					return rs.getInt("Conteggio");
+				}
+			}
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel conteggio di elementi pubblicati");
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 }

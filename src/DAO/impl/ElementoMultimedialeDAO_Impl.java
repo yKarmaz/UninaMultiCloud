@@ -204,4 +204,25 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao {
         }
         return null;
     }
+
+	@Override
+	public int getSommaVisualizzazioni(Utente u) {
+		String query = "SELECT SUM(numVisualizzazioni) AS SommaVisualizzazioni FROM contenutimultimediali WHERE id_utente = ?";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, u.getIdUtente());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				if(rs.next())
+				{
+					return rs.getInt("SommaVisualizzazioni");
+				}
+			} 
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero della somma di visualizzazioni");
+			e.printStackTrace();
+		}
+		return 0;
+	}
 }

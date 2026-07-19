@@ -122,4 +122,25 @@ public class FruizioneDAO_Impl implements FruizioneDao {
 		return false;
 	}
 
+	@Override
+	public int getFruizioniDiUtente(Utente u) {
+		String query = "SELECT COUNT(*) AS Conteggio FROM  Fruizioni WHERE id_Utente = ?";
+		try(PreparedStatement statement = conn.prepareStatement(query))
+		{
+			statement.setInt(1, u.getIdUtente());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				if(rs.next())
+				{
+					return rs.getInt("Conteggio");
+				}
+			}
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel conteggio di visualizzazioni");
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 }

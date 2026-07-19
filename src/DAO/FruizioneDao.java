@@ -14,4 +14,6 @@ public interface FruizioneDao {
 	Fruizione modificaFruizione(Fruizione vecchiaFruizione, Fruizione nuovaFruizione);
 	
 	boolean cancellaFruizione(Fruizione fruizione);
+
+	int getFruizioniDiUtente(Utente u);
 }

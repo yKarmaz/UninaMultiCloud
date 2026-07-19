@@ -45,11 +45,11 @@ public class SessionController {
             MediaController mediaCtrl = new MediaController(this);
             PlaylistController playlistCtrl = new PlaylistController(this);
             
-            // IN FUTURO: Scommenta questo quando farai il ReportController
-            // ReportController reportCtrl = new ReportController(this); 
+            
+            ReportController reportCtrl = new ReportController(this); 
             
             // Istanzia e mostra la HomePage vera e propria
-            HomePage home = new HomePage(this, mediaCtrl, playlistCtrl); 
+            HomePage home = new HomePage(this, mediaCtrl, playlistCtrl, reportCtrl); 
             home.setVisible(true);
             
             System.out.println("Login effettuato con successo per: " + utenteLoggato.getUsername());
