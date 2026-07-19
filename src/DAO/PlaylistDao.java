@@ -28,4 +28,12 @@ public interface PlaylistDao {
 	ArrayList<ElementoMultimediale> estraiBraniDaPlaylist(Playlist playlist);
 	
 	boolean aggiungiBrano(Playlist playlist, ElementoMultimediale elemento);
+
+	String getCategoriaPlaylist(Playlist p);
+
+	ArrayList<String> getAllCategorie();
+
+	
+
+	
 }

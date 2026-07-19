@@ -44,7 +44,7 @@ public class CreaPlaylist extends JPanel {
         pnlForm.add(pnlRadio);
 
         pnlForm.add(new JLabel("Categoria (solo Pubblica):"));
-        comboCategoria = new JComboBox<>(new String[]{"Nessuna", "Musica", "Podcast", "Educazione"});
+        comboCategoria = new JComboBox<>(playlistController.getAllCategorie().toArray(new String[0]));	
         comboCategoria.setEnabled(false);
         pnlForm.add(comboCategoria);
 
@@ -70,6 +70,7 @@ public class CreaPlaylist extends JPanel {
 
             boolean ok = playlistController.creaNuovaPlaylist(txtNome.getText().trim(), tipo, cat);
             if (ok) {
+            	
                 JOptionPane.showMessageDialog(this, "Playlist creata!");
                 homePage.cambiaPannelloCentrale(new JPanel());
             } else {

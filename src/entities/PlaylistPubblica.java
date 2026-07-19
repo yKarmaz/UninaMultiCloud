@@ -23,4 +23,8 @@ public class PlaylistPubblica extends Playlist {
     	this.numVisualizzazioni++;
     }
 
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
+	}
+
 }

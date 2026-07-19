@@ -8,7 +8,7 @@ import java.util.List;
 import controllers.*;
 import entities.Playlist;
 import entities.PlaylistPubblica;
-
+import entities.Playlist;
 public class CatalogoPubbliche extends JPanel {
     private PlaylistController playlistController;
     private MediaController mediaController;
@@ -80,7 +80,7 @@ public class CatalogoPubbliche extends JPanel {
         modelloTabella.setRowCount(0);
         
         for(Playlist p : listaPubblicheGlobali) {
-            String categoria = "N/A";
+            String categoria = playlistController.getCategoria(p);
             if(p instanceof PlaylistPubblica) {
                 categoria = ((PlaylistPubblica) p).getCategoria();
             }

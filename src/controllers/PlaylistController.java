@@ -100,4 +100,18 @@ public class PlaylistController {
         }
         return soloMiePubbliche;
     }
+
+	public String getCategoria(Playlist p) {
+		return playlistDao.getCategoriaPlaylist(p);
+	}
+	
+	public ArrayList<String> getAllCategorie()
+	{
+		return playlistDao.getAllCategorie();
+	}
+
+	public void setCategoria(PlaylistPubblica p, String categoria) {
+		p.setCategoria(categoria);
+		
+	}
 }

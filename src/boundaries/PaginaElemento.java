@@ -88,6 +88,8 @@ public class PaginaElemento extends JPanel {
 
     private void popolaTendinaPlaylist() {
         List<Playlist> mie = playlistController.getMiePlaylistPrivate();
+        mie.addAll(playlistController.getMiePlaylistCondivise());
+        mie.addAll(playlistController.getMiePlaylistPubbliche());
         for(Playlist p : mie) {
             comboMiePlaylist.addItem(new PlaylistBoxItem(p));
         }

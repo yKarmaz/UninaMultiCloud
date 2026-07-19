@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import DAO.PlaylistDao;
 import DAO.UtenteDao;
+import controllers.PlaylistController;
 import DAO.ElementoMultimedialeDao;
 import entities.*;
-
 public class PlaylistDAO_Impl implements PlaylistDao{
 	Connection connessione;
 	
@@ -60,23 +60,60 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        }
 	        
 	        // --- STEP 2: Inserimento figlio ---
+	     // --- STEP 2: Inserimento figlio ---
 	        if (playlist instanceof PlaylistPubblica) {
+	            PlaylistPubblica playlistPubblica = (PlaylistPubblica) playlist;
+	            
+	            // 2a. Inserimento nella tabella figlia playlist_pubblica
 	            stmtFiglio = connessione.prepareStatement(queryFigliaPubblica);
 	            stmtFiglio.setInt(1, idGenerato);
 	            stmtFiglio.setLong(2, 0); // numvisualizzazioni a 0
+	            stmtFiglio.executeUpdate();
+	            stmtFiglio.close(); // Chiudiamo questo statement per riutilizzare la variabile o evitare leak
 	            
+	            // 2b. Inserimento nella tabella associativa appartiene_categoria
+	            String nomeCategoria = playlistPubblica.getCategoria();
+	            if (nomeCategoria != null && !nomeCategoria.isEmpty()) {
+	                String queryCercaIdCat = "SELECT id_categoria FROM categorie WHERE nomecategoria = ?";
+	                String queryInsAssociazione = "INSERT INTO appartiene_categoria (id_categoria, id_playlist) VALUES (?, ?)";
+	                
+	                // Cerchiamo l'ID numerico della categoria a partire dal nome
+	                try (PreparedStatement stmtCerca = connessione.prepareStatement(queryCercaIdCat)) {
+	                    stmtCerca.setString(1, nomeCategoria);
+	                    try (ResultSet rs = stmtCerca.executeQuery()) {
+	                        int idCategoria = -1;
+	                        if (rs.next()) {
+	                            idCategoria = rs.getInt("id_categoria");
+	                        }
+	                        
+	                        if (idCategoria != -1) {
+	                            // Eseguiamo l'inserimento nella tabella associativa
+	                            try (PreparedStatement stmtAssoc = connessione.prepareStatement(queryInsAssociazione)) {
+	                                stmtAssoc.setInt(1, idCategoria);
+	                                stmtAssoc.setInt(2, idGenerato);
+	                                stmtAssoc.executeUpdate();
+	                            }
+	                        } else {
+	                            System.err.println("Attenzione: La categoria '" + nomeCategoria + "' non esiste sul DB. Associazione saltata.");
+	                        }
+	                    }
+	                }
+	            }
+
 	        } else if (playlist instanceof PlaylistCondivisa) {
 	            PlaylistCondivisa playlistCondivisa = (PlaylistCondivisa) playlist;
 	            stmtFiglio = connessione.prepareStatement(queryFigliaCondivisa);
 	            stmtFiglio.setInt(1, idGenerato);
-	            stmtFiglio.setString(2, playlistCondivisa.getURL_Invito()); // Passiamo l'URL autogenerato da Java
+	            stmtFiglio.setString(2, playlistCondivisa.getURL_Invito());
+	            stmtFiglio.executeUpdate();
 	            
 	        } else { // PlaylistPrivata
 	            stmtFiglio = connessione.prepareStatement(queryFigliaPrivata);
 	            stmtFiglio.setInt(1, idGenerato);
+	            stmtFiglio.executeUpdate();
 	        }
 	        
-	        stmtFiglio.executeUpdate();
+	        
 	        
 	        // --- STEP 3: Commit ---
 	        connessione.commit();
@@ -446,32 +483,39 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 
 	@Override
 	public ArrayList<Playlist> trovaTutteLePubbliche() {
-		ArrayList<Playlist> playlistPubbliche = new ArrayList<>();
-		String query = "SELECT * FROM playlist_pubblica";
-		try(PreparedStatement statement = connessione.prepareStatement(query))
-		{
-			try(ResultSet rs = statement.executeQuery())
-			{
-				while(rs.next())
-				{
-					int idPlaylist = rs.getInt(1);
-					Playlist supporto = new PlaylistPubblica(idPlaylist, null, null, null);
-					Playlist playlistCompleta = trovaPlaylist(supporto);
-					if(playlistCompleta != null)
-					{
-						playlistPubbliche.add(playlistCompleta);
-					}
-				}
-			}
-			
-			return playlistPubbliche;
-			
-		}catch(SQLException e)
-		{
-			System.out.println("Errore nel recupero delle playlist pubbliche");
-			e.printStackTrace();
-		}
-		return null;
+	    ArrayList<Playlist> playlistPubbliche = new ArrayList<>();
+	    String query = "SELECT * FROM playlist_pubblica";
+	    try(PreparedStatement statement = connessione.prepareStatement(query))
+	    {
+	        try(ResultSet rs = statement.executeQuery())
+	        {
+	            while(rs.next())
+	            {
+	                int idPlaylist = rs.getInt(1);
+	                Playlist supporto = new PlaylistPubblica(idPlaylist, null, null, null);
+	                Playlist playlistCompleta = trovaPlaylist(supporto);
+	                
+	                if(playlistCompleta != null)
+	                {
+	                    // --- CORREZIONE: Recuperiamo la categoria reale dal DB ---
+	                    if(playlistCompleta instanceof PlaylistPubblica) {
+	                        String categoriaReale = getCategoriaPlaylist(playlistCompleta);
+	                        // Assicurati che la tua classe PlaylistPubblica abbia un setter per la categoria, ad esempio:
+	                        ((PlaylistPubblica) playlistCompleta).setCategoria(categoriaReale); 
+	                    }
+	                    
+	                    playlistPubbliche.add(playlistCompleta);
+	                }
+	            }
+	        }
+	        return playlistPubbliche;
+	        
+	    }catch(SQLException e)
+	    {
+	        System.out.println("Errore nel recupero delle playlist pubbliche");
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
 
 
@@ -563,6 +607,56 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    
 	    return listaBraniDaPlaylist; 
 	}
+	@Override
+	public ArrayList<String> getAllCategorie()
+	{
+		ArrayList<String> listaCategorieArrayList = new ArrayList<>();
+		String query = "SELECT nomecategoria FROM categorie";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			try(ResultSet rs = statement.executeQuery())
+			{
+				while(rs.next())
+				{
+					listaCategorieArrayList.add(rs.getString(1));
+				}
+			}
+			
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nel recupero delle categorie");
+			e.printStackTrace();
+		}
+		return listaCategorieArrayList;
+	}
+	
+	
+
+	@Override
+	public String getCategoriaPlaylist(Playlist p) {
+		String query = "SELECT nomecategoria FROM Categorie c JOIN appartiene_categoria ac ON c.id_categoria = ac.id_categoria WHERE ac.id_Playlist = ?";
+		String categoria = "N/A";
+		try(PreparedStatement statement = connessione.prepareStatement(query))
+		{
+			statement.setInt(1, p.getID());
+			try(ResultSet rs = statement.executeQuery())
+			{
+				if(rs.next())
+				{
+					categoria = rs.getString("nomecategoria");
+				}
+			}
+		}catch(SQLException e)
+		{
+			System.out.println("Errore nella ricerca della categoria della playlist");
+			e.printStackTrace();
+		}
+		return categoria;
+	}
+
+
+	
+	
 	
 	
 }
