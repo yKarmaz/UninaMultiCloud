@@ -11,7 +11,7 @@ public class Main {
     	
         System.out.println("Avvio dell'applicazione UninaMultiCloud...");
         
-        // Deleghiamo l'avvio della grafica al thread corretto (Event Dispatch Thread)
+        // Deleghiamo l'avvio della grafica al thread corretto 
         SwingUtilities.invokeLater(() -> {
             
             // 1. Accendiamo il "cervello" iniziale: il SessionController

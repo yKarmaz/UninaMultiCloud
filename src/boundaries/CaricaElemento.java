@@ -58,7 +58,7 @@ public class CaricaElemento extends JPanel {
         pnlFile.add(lblPercorsoFile);
         pnlForm.add(pnlFile);
 
-        // Aggiungiamo il form al wrapper
+        
         pnlFormWrapper.add(pnlForm, BorderLayout.NORTH);
         add(pnlFormWrapper, BorderLayout.CENTER);
 

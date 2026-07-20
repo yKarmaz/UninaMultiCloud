@@ -25,7 +25,7 @@ public class CreaPlaylist extends JPanel {
         lblTitolo.setFont(new Font("Tahoma", Font.BOLD, 26));
         add(lblTitolo, BorderLayout.NORTH);
 
-        // WRAPPER PER EVITARE DILATAZIONI
+        
         JPanel pnlFormWrapper = new JPanel(new BorderLayout());
         JPanel pnlForm = new JPanel(new GridLayout(3, 2, 10, 20));
         

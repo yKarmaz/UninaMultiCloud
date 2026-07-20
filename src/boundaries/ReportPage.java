@@ -50,7 +50,7 @@ public class ReportPage extends JPanel {
     }
 
     private void configuraDati() {
-        // Esempio Serie 1: Elementi totali caricati per tipologia di Cloud o Media
+        // Elementi totali caricati per tipologia
         dataset.setValue(reportController.getNumeroContenutiPubblicati(reportController.getUtenteLoggato()), "Contenuti Pubblicati", "Contenuti Pubblicati");
         dataset.setValue(reportController.getNumeroElementiVisualizzati(reportController.getUtenteLoggato()), "Elementi Visualizzati", "Elementi Visualizzati");
         dataset.setValue(reportController.getNumeroVisualizzazioni(reportController.getUtenteLoggato()), "Numero Visualizzazioni", "Numero Visualizzazioni");
