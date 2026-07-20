@@ -4,13 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 import DAO.PlaylistDao;
 import DAO.UtenteDao;
-import controllers.PlaylistController;
 import DAO.ElementoMultimedialeDao;
 import entities.*;
 public class PlaylistDAO_Impl implements PlaylistDao{
@@ -20,13 +17,11 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	{
 		connessione = conn;
 	}
-	
-	
+		
 	@Override
 	public Playlist salvaPlaylist(Playlist playlist) {
-	    // Query con i nomi delle colonne reali in minuscolo come da DB
-	    String queryPadre = "INSERT INTO playlist (nome, id_utente) VALUES (?, ?)";
 	    
+	    String queryPadre = "INSERT INTO playlist (nome, id_utente) VALUES (?, ?)";
 	    String queryFigliaPubblica = "INSERT INTO playlist_pubblica (id_playlist, numvisualizzazioni) VALUES (?, ?)";
 	    String queryFigliaCondivisa = "INSERT INTO playlist_condivisa (id_playlist, url_invito) VALUES (?, ?)";
 	    String queryFigliaPrivata = "INSERT INTO playlist_privata (id_playlist) VALUES (?)";
@@ -39,7 +34,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        connessione.setAutoCommit(false);
 	        
 	        // --- STEP 1: Inserimento padre (Specifichiamo esplicitamente "id_playlist" per Postgres) ---
-	        stmtPadre = connessione.prepareStatement(queryPadre, new String[] { "id_playlist" });
+	        stmtPadre = connessione.prepareStatement(queryPadre, new String[] { "id_playlist" }); 
 	        stmtPadre.setString(1, playlist.getNome());
 	        stmtPadre.setInt(2, playlist.getProprietario().getIdUtente());
 	        
@@ -49,7 +44,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        if (righePadre > 0) {
 	            try (ResultSet generatedKeys = stmtPadre.getGeneratedKeys()) {
 	                if (generatedKeys.next()) {
-	                    idGenerato = generatedKeys.getInt(1); // Recuperiamo il valore reale generato dal SERIAL/IDENTITY
+	                    idGenerato = generatedKeys.getInt(1); // Recuperiamo il valore reale generato dal SERIAL
 	                    playlist.setIdPlaylist(idGenerato); // Aggiorniamo l'oggetto in RAM
 	                }
 	            }
@@ -59,25 +54,25 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	            throw new SQLException("Impossibile recuperare l'ID autogenerato per la Playlist.");
 	        }
 	        
+	        
 	        // --- STEP 2: Inserimento figlio ---
-	     // --- STEP 2: Inserimento figlio ---
+	        // 2a. Inserimento nella tabella figlia playlist_pubblica
 	        if (playlist instanceof PlaylistPubblica) {
 	            PlaylistPubblica playlistPubblica = (PlaylistPubblica) playlist;
 	            
-	            // 2a. Inserimento nella tabella figlia playlist_pubblica
+	            
 	            stmtFiglio = connessione.prepareStatement(queryFigliaPubblica);
 	            stmtFiglio.setInt(1, idGenerato);
 	            stmtFiglio.setLong(2, 0); // numvisualizzazioni a 0
 	            stmtFiglio.executeUpdate();
-	            stmtFiglio.close(); // Chiudiamo questo statement per riutilizzare la variabile o evitare leak
-	            
-	            // 2b. Inserimento nella tabella associativa appartiene_categoria
+	            stmtFiglio.close(); // Chiudiamo questo statement
+	            //Inserimento nella tabella associativa appartiene_categoria
 	            String nomeCategoria = playlistPubblica.getCategoria();
 	            if (nomeCategoria != null && !nomeCategoria.isEmpty()) {
 	                String queryCercaIdCat = "SELECT id_categoria FROM categorie WHERE nomecategoria = ?";
 	                String queryInsAssociazione = "INSERT INTO appartiene_categoria (id_categoria, id_playlist) VALUES (?, ?)";
 	                
-	                // Cerchiamo l'ID numerico della categoria a partire dal nome
+	                // Cerchiamo l'ID numerico della categoria a partire dal nome univoco
 	                try (PreparedStatement stmtCerca = connessione.prepareStatement(queryCercaIdCat)) {
 	                    stmtCerca.setString(1, nomeCategoria);
 	                    try (ResultSet rs = stmtCerca.executeQuery()) {
@@ -87,7 +82,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	                        }
 	                        
 	                        if (idCategoria != -1) {
-	                            // Eseguiamo l'inserimento nella tabella associativa
+	                            
 	                            try (PreparedStatement stmtAssoc = connessione.prepareStatement(queryInsAssociazione)) {
 	                                stmtAssoc.setInt(1, idCategoria);
 	                                stmtAssoc.setInt(2, idGenerato);
@@ -99,15 +94,20 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	                    }
 	                }
 	            }
-
-	        } else if (playlist instanceof PlaylistCondivisa) {
+	            
+	            
+	        }
+	        // 2b. Inserimento nella tabella figlia playlist_condivisa
+	        else if (playlist instanceof PlaylistCondivisa) {
 	            PlaylistCondivisa playlistCondivisa = (PlaylistCondivisa) playlist;
 	            stmtFiglio = connessione.prepareStatement(queryFigliaCondivisa);
 	            stmtFiglio.setInt(1, idGenerato);
 	            stmtFiglio.setString(2, playlistCondivisa.getURL_Invito());
 	            stmtFiglio.executeUpdate();
 	            
-	        } else { // PlaylistPrivata
+	        } 
+	        //2c. Inserimento nella tabella figlia playlist_privata
+	        else { 
 	            stmtFiglio = connessione.prepareStatement(queryFigliaPrivata);
 	            stmtFiglio.setInt(1, idGenerato);
 	            stmtFiglio.executeUpdate();
@@ -118,7 +118,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        // --- STEP 3: Commit ---
 	        connessione.commit();
 	        
-	        return playlist; // Ora restituisce la playlist con il vero ID assegnato!
+	        return playlist; 
 	        
 	    } catch (SQLException e) {
 	        System.err.println("Errore durante il salvataggio della playlist. Eseguo rollback...");
@@ -142,7 +142,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    return null;
 	}
 
-	
 	@Override
 	public Playlist trovaPlaylist(Playlist playlist) {
 		String query = "SELECT p.ID_Playlist, p.nome, p.ID_Utente, "
@@ -177,14 +176,14 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 								playlistPubblica.getCategoria()
 								);
 					} else if(playlist instanceof PlaylistCondivisa) {
-						PlaylistCondivisa playlistCondivisa = (PlaylistCondivisa) playlist;
+						
 						return new PlaylistCondivisa(
 									ID,
 									nomePlaylist,
 									proprietario
 								);
 					} else {
-						PlaylistPrivata playlistPrivata = (PlaylistPrivata) playlist;
+						
 						return new PlaylistPrivata(
 								ID,
 								nomePlaylist,
@@ -219,11 +218,11 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    String inserisciPrivata = "INSERT INTO playlist_privata (id_playlist) VALUES (?)";
 	    
 	    PreparedStatement stmtPadre = null;
-	    PreparedStatement stmtElimina = null;
+	   
 	    PreparedStatement stmtInserisci = null;
 	    
 	    try {
-	        // Avviamo la transazione manuale per garantire l'atomicità
+	        // Disattiviamo l'autocommit per la transazione
 	        connessione.setAutoCommit(false);
 	        
 	        // --- STEP 1: Aggiorna il nome della Playlist nella tabella padre ---
@@ -239,8 +238,8 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        }
 	        
 	        // --- STEP 2: Rimuoviamo la playlist da TUTTE le tabelle figlie ---
-	        // Questo garantisce che non violiamo il vincolo di disgiunzione (max 1 presenza nelle figlie)
-	        // e ripulisce il vecchio stato prima di inserire quello nuovo.
+	        // Questo garantisce che non violiamo il vincolo di disgiunzione 
+	        
 	        try (PreparedStatement stmtDelPub = connessione.prepareStatement(eliminaPubblica);
 	             PreparedStatement stmtDelCond = connessione.prepareStatement(eliminaCondivisa);
 	             PreparedStatement stmtDelPriv = connessione.prepareStatement(eliminaPrivata)) {
@@ -265,10 +264,10 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	            PlaylistCondivisa cond = (PlaylistCondivisa) playlist;
 	            stmtInserisci = connessione.prepareStatement(inserisciCondivisa);
 	            stmtInserisci.setInt(1, cond.getID());
-	            // Se l'URL di invito è nullo (es. se la playlist è appena diventata condivisa e il DB deve rigenerarlo)
-	            // puoi passare null per far scattare il valore di default del DB, oppure passare l'url attuale.
+	        
+	            // Se l'URL di invito è nullo, va generato         
 	            if (cond.getURL_Invito() != null) {
-	                stmtInserisci.setString(2, cond.getURL_Invito());
+	                stmtInserisci.setString(2, cond.generaURL());
 	            } else {
 	                stmtInserisci.setNull(2, java.sql.Types.VARCHAR);
 	            }
@@ -281,8 +280,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        stmtInserisci.executeUpdate();
 	        
 	        // --- STEP 4: Conferma definitiva ---
-	        // Al commit, il trigger verificherà che esista esattamente 1 record nelle figlie.
-	        // Avendo cancellato tutto prima e inserito solo la sottoclasse corretta, il controllo passerà a pieni voti!
 	        connessione.commit();
 	        return true;
 	        
@@ -297,7 +294,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        }
 	        e.printStackTrace();
 	    } finally {
-	        // Ripristiniamo l'ambiente JDBC originario e liberiamo le risorse
 	        try {
 	            connessione.setAutoCommit(true);
 	            if (stmtPadre != null) stmtPadre.close();
@@ -312,7 +308,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 
 	@Override
 	public boolean cancellaPlaylist(Playlist playlist) {
-	    // 1. Definiamo le query di eliminazione per le sottoclassi e per la classe padre
+	    
 	    String queryFigliaPubblica = "DELETE FROM playlist_pubblica WHERE id_playlist = ?";
 	    String queryFigliaCondivisa = "DELETE FROM playlist_condivisa WHERE id_playlist = ?";
 	    String queryFigliaPrivata = "DELETE FROM playlist_privata WHERE id_playlist = ?";
@@ -323,10 +319,9 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    PreparedStatement stmtPadre = null;
 	    
 	    try {
-	        // Disattiviamo l'auto-commit per avviare una transazione manuale sicura
+	        // Disattiviamo l'autocommit per la transazione
 	        connessione.setAutoCommit(false);
-	        
-	        // 2. Identifichiamo il tipo di playlist in RAM ed eliminiamo il record dalla tabella figlia corretta
+	       
 	        if (playlist instanceof PlaylistPubblica) {
 	            stmtFiglia = connessione.prepareStatement(queryFigliaPubblica);
 	        } else if (playlist instanceof PlaylistCondivisa) {
@@ -338,19 +333,16 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        stmtFiglia.setInt(1, playlist.getID());
 	        stmtFiglia.executeUpdate();
 	        
-	        // 3. Eliminiamo il record dalla tabella padre "playlist"
 	        stmtPadre = connessione.prepareStatement(queryPadre);
 	        stmtPadre.setInt(1, playlist.getID());
 	        int righeCancellate = stmtPadre.executeUpdate();
-	        
-	        // 4. Se tutto è andato a buon fine, confermiamo la transazione sul database
 	        connessione.commit();
 	        
 	        return righeCancellate > 0;
 	        
 	    } catch (SQLException e) {
-	        // In caso di qualsiasi errore, facciamo il rollback per evitare dati corrotti
-	        System.err.println("Errore durante la cancellazione della playlist. Eseguo il rollback...");
+	        
+	        System.err.println("Errore durante la cancellazione della playlist");
 	        try {
 	            if (connessione != null) {
 	                connessione.rollback();
@@ -360,7 +352,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	        }
 	        e.printStackTrace();
 	    } finally {
-	        // Ripristiniamo l'autocommit a true e chiudiamo gli statement in sicurezza
+	        
 	        try {
 	            connessione.setAutoCommit(true);
 	            if (stmtFiglia != null) stmtFiglia.close();
@@ -373,17 +365,16 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    return false;
 	}
 
-
 	@Override
 	public ArrayList<Playlist> listaPlaylistProprie(Utente utente) {
 	    ArrayList<Playlist> listaPlaylist = new ArrayList<>();
 	    
-	    // Controllo di sicurezza iniziale
+	    // Controllo preventivo
 	    if (utente == null) {
 	        return listaPlaylist;
 	    }
 
-	    // UNICA QUERY EFFICIENTE: Estrae le playlist e decide il tipo tramite le LEFT JOIN
+	    
 	    String query = "SELECT p.ID_Playlist, p.nome, "
 	                 + "pub.numvisualizzazioni, "
 	                 + "cond.URL_Invito, "
@@ -402,8 +393,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	                int idPlaylist = rs.getInt("ID_Playlist");
 	                String nomePlaylist = rs.getString("nome");
 
-	                // Leggiamo i risultati della JOIN per istanziare l'oggetto corretto
-	                // Usiamo l'oggetto 'utente' che abbiamo già, senza rifare la query!
+	                //controllo per attributi specifici delle figlie
 	                if (rs.getObject("numvisualizzazioni") != null) {
 	                    listaPlaylist.add(new PlaylistPubblica(idPlaylist, nomePlaylist, utente, "Generica"));
 	                } 
@@ -480,7 +470,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		return listaPlaylist;
 	}
 
-
 	@Override
 	public ArrayList<Playlist> trovaTutteLePubbliche() {
 	    ArrayList<Playlist> playlistPubbliche = new ArrayList<>();
@@ -497,10 +486,10 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	                
 	                if(playlistCompleta != null)
 	                {
-	                    // --- CORREZIONE: Recuperiamo la categoria reale dal DB ---
+	                    
 	                    if(playlistCompleta instanceof PlaylistPubblica) {
-	                        String categoriaReale = getCategoriaPlaylist(playlistCompleta);
-	                        // Assicurati che la tua classe PlaylistPubblica abbia un setter per la categoria, ad esempio:
+	                        String categoriaReale = getCategoriaPlaylist(playlistCompleta); //metodo del DAO
+
 	                        ((PlaylistPubblica) playlistCompleta).setCategoria(categoriaReale); 
 	                    }
 	                    
@@ -517,7 +506,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    }
 	    return null;
 	}
-
 
 	@Override
 	public ArrayList<Playlist> trovaPlaylistPrivateUtente(int idUtente) {
@@ -550,7 +538,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		return null;
 	}
 
-
 	@Override
 	public boolean aggiungiBrano(Playlist playlist, ElementoMultimediale elemento) {
 		String query = "INSERT INTO Contiene(id_elemento, id_playlist) VALUES (?, ?)";
@@ -571,28 +558,23 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		}
 		return false;
 	}
-	//commento
-
-
+	
 	@Override
 	public ArrayList<ElementoMultimediale> estraiBraniDaPlaylist(Playlist playlist) {
 	    ArrayList<ElementoMultimediale> listaBraniDaPlaylist = new ArrayList<>();
 	    
-	    // Cambiamo la query per selezionare solo gli ID dei brani associati alla playlist
+	    
 	    String query = "SELECT id_elemento FROM Contiene WHERE id_playlist = ?";
 	                   
 	    try (PreparedStatement statement = connessione.prepareStatement(query)) {
 	        statement.setInt(1, playlist.getID());
 	        
 	        try (ResultSet rs = statement.executeQuery()) {
-	            // Istanziato il DAO degli elementi multimediali usando la sua implementazione
-	            // (Assicurati che il nome della classe sia ElementoMultimedialeDAO_Impl o simile)
+	            
 	            ElementoMultimedialeDao elementoDao = new ElementoMultimedialeDAO_Impl(connessione);
 	            
 	            while (rs.next()) {
 	                int idElemento = rs.getInt("id_elemento");
-	                
-	                // Deleghiamo il caricamento e il mapping dell'oggetto intero al metodo dell'interfaccia
 	                ElementoMultimediale el = elementoDao.trovaContenutoDalD(idElemento);
 	                
 	                if (el != null) {
@@ -607,6 +589,7 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 	    
 	    return listaBraniDaPlaylist; 
 	}
+	
 	@Override
 	public ArrayList<String> getAllCategorie()
 	{
@@ -630,8 +613,6 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		return listaCategorieArrayList;
 	}
 	
-	
-
 	@Override
 	public String getCategoriaPlaylist(Playlist p) {
 		String query = "SELECT nomecategoria FROM Categorie c JOIN appartiene_categoria ac ON c.id_categoria = ac.id_categoria WHERE ac.id_Playlist = ?";
@@ -654,9 +635,4 @@ public class PlaylistDAO_Impl implements PlaylistDao{
 		return categoria;
 	}
 
-
-	
-	
-	
-	
 }

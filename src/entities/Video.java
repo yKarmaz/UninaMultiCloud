@@ -1,6 +1,5 @@
 package entities;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 public class Video extends ElementoMultimediale {
@@ -15,10 +14,6 @@ public class Video extends ElementoMultimediale {
 
 	
 	
-	public void riproduciVideo()
-	{
-		
-	}
 
 	
 	

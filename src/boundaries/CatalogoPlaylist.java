@@ -15,7 +15,7 @@ public class CatalogoPlaylist extends JPanel {
     private JTabbedPane pannelloSchede;
     private JTable tabellaPrivate, tabellaPubbliche, tabellaCondivise;
     
-    // FONDAMENTALE: Teniamo le liste vere in RAM per poter aprire la playlist cliccata
+    
     private List<Playlist> listPrivate, listPubbliche, listCondivise;
 
     public CatalogoPlaylist(PlaylistController playlistController, MediaController mediaController, HomePage homePage) {
@@ -81,7 +81,7 @@ public class CatalogoPlaylist extends JPanel {
         modPriv.setRowCount(0);
         for(Playlist p : listPrivate) modPriv.addRow(new Object[]{p.getNome(), p.getProprietario().getUsername()});
 
-     // Popola Pubbliche (SOLO LE TUE)
+        // Popola Pubbliche 
         listPubbliche = playlistController.getMiePlaylistPubbliche(); // <-- Usa il nuovo metodo!
         DefaultTableModel modPub = (DefaultTableModel) tabellaPubbliche.getModel();
         modPub.setRowCount(0);

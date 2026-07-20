@@ -14,10 +14,10 @@ import entities.Video;
 import entities.Fruizione;
 import entities.ElementoMultimediale;
 import entities.Utente;
-//commento
+
 public class MediaController {
     private ElementoMultimedialeDao mediaDao;
-    private FruizioneDao fruizioneDao; // Serve per registrare gli ascolti
+    private FruizioneDao fruizioneDao;
     private SessionController sessionCtrl;
 
     public MediaController(SessionController sessionCtrl) {
@@ -40,7 +40,7 @@ public class MediaController {
         }
 
         ElementoMultimediale nuovoElemento;
-        // Valori dummy per durata e bitrate. In un progetto finito si estraggono dai metadati del file.
+        // Valori dummy per durata e bitrate. Si dovrebbero estrarre dai metadati del file.
         if (tipo.equals("Audio")) {
             nuovoElemento = new Audio(0, descrizione, titolo, 200, java.time.LocalDate.now(), percorso, proprietario, 320);
         } else {
@@ -57,8 +57,7 @@ public class MediaController {
     
     public void registraFruizione(ElementoMultimediale el) {
         Utente u = sessionCtrl.getUtenteLoggato();	
-        System.out.println("DEBUG INSERIMENTO DI FRUIZIONE: ID Utente: " + u.getIdUtente());
-        System.out.println("DEBUG INSERIMENTO DI FRUIZIONE: ID Elemento: " + el.getIdElemento());
+        
         if(u != null) {
             Fruizione f = new Fruizione(el.getIdElemento(), u.getIdUtente(), LocalDateTime.now());
             fruizioneDao.SalvaFruizione(f);

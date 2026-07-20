@@ -18,7 +18,7 @@ public class CatalogoElementi extends JPanel {
     private JTable tabellaElementi;
     private DefaultTableModel modelloTabella;
     
-    // LA LISTA VERA IN RAM
+    
     private List<ElementoMultimediale> listaRisultati;
 
     public CatalogoElementi(MediaController mediaCtrl, PlaylistController playCtrl, HomePage homePage) {
@@ -95,7 +95,7 @@ public class CatalogoElementi extends JPanel {
                 return;
             }
             
-            // MAGIA: Prendi l'oggetto vero e passalo a PaginaElemento
+            //Prendo l'oggetto e lo passa a PaginaElemento
             ElementoMultimediale elSelezionato = listaRisultati.get(riga);
             homePage.cambiaPannelloCentrale(new PaginaElemento(mediaController, playlistController, homePage, elSelezionato, this));
         });

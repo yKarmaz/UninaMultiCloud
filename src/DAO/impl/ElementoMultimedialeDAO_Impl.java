@@ -18,7 +18,7 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao {
     public ElementoMultimedialeDAO_Impl(Connection connessione) {
         this.connessione = connessione;
     }
-  //commento
+  
 
     @Override
     public int salvaContenuto(ElementoMultimediale e) {
@@ -78,11 +78,10 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao {
         return null;
     }
 
-    // NUOVO METODO: Essenziale per popolare le tabelle del catalogo
     @Override
     public List<ElementoMultimediale> cercaElementi(String testo, String tipoMedia) {
         List<ElementoMultimediale> lista = new ArrayList<>();
-        String query = "SELECT * FROM contenutiMultimediali WHERE 1=1 ";
+        String query = "SELECT * FROM contenutiMultimediali WHERE 1=1 "; //iniziamo a scrivere la query, da finire dopo i controlli
         
         if (testo != null && !testo.trim().isEmpty()) {
             query += " AND titolo ILIKE ? ";
@@ -172,12 +171,9 @@ public class ElementoMultimedialeDAO_Impl implements ElementoMultimedialeDao {
         }
     }
 
-    /**
-     * Metodo di supporto per evitare duplicazioni di codice:
-     * Legge una riga del ResultSet e costruisce l'Entity corretta (Audio o Video)
-     */
+    
     private ElementoMultimediale mappaRisultatoAdElemento(ResultSet rs) throws SQLException {
-        // CORREZIONE FATALE: Estraggo l'id_utente, non campi inesistenti come "username".
+        
         int idProprietario = rs.getInt("id_utente");
         
         UtenteDao utenteDao = new UtenteDAO_Impl(connessione);

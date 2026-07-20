@@ -76,7 +76,7 @@ public class HomePage extends JFrame {
         	
     }
 
-    // IL METODO FONDAMENTALE PER LA NAVIGAZIONE
+    //Metodo per la navigazione
     public void cambiaPannelloCentrale(JPanel nuovoPannello) {
         pannelloCentrale.removeAll();
         pannelloCentrale.add(nuovoPannello, BorderLayout.CENTER);

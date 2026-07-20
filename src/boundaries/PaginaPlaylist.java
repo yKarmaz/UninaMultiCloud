@@ -69,7 +69,7 @@ public class PaginaPlaylist extends JPanel {
 
     private void caricaBraniDalDB() {
         modelloTabella.setRowCount(0);
-        // Richiesta reale al controller: Dammi i brani di QUESTA playlist
+        
         listaBraniReali = playlistController.getBraniPlaylist(playlistCorrente);
         
         for(ElementoMultimediale el : listaBraniReali) {

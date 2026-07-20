@@ -13,7 +13,7 @@ import entities.PlaylistPubblica;
 import entities.PlaylistCondivisa;
 import entities.ElementoMultimediale;
 import entities.Utente;
-//commento
+
 
 public class PlaylistController {
     private PlaylistDao playlistDao;
@@ -67,9 +67,7 @@ public class PlaylistController {
         return playlistDao.listaPlaylistInCondivisioneConMeDaMe(u);
     }
 
-    // =========================================================================
-    // I 2 METODI SOTTO RICHIEDONO CHE IL TUO COMPAGNO AGGIORNI IL PLAYLIST_DAO
-    // =========================================================================
+    
 
     public boolean aggiungiElementoAPlaylist(Playlist p, ElementoMultimediale el) {
        
@@ -78,7 +76,7 @@ public class PlaylistController {
     }
 
     public List<ElementoMultimediale> getBraniPlaylist(Playlist p) {
-        // Quando il DAO sarà pronto, dovrai scommentare questa riga:
+       
         return playlistDao.estraiBraniDaPlaylist(p); 
     }
     
@@ -86,11 +84,11 @@ public class PlaylistController {
         Utente u = sessionCtrl.getUtenteLoggato();
         if (u == null) return new ArrayList<>();
         
-        // Chiediamo al DAO TUTTE le playlist di questo utente
+        
         List<Playlist> tutteLeMie = playlistDao.listaPlaylistProprie(u);
         List<Playlist> soloMiePubbliche = new ArrayList<>();
         
-        // Filtriamo tenendo solo quelle che sono istanza di PlaylistPubblica
+       
         if (tutteLeMie != null) {
             for(Playlist p : tutteLeMie) {
                 if(p instanceof PlaylistPubblica) {

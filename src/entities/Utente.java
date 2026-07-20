@@ -27,8 +27,7 @@ public class Utente {
 		this.password = password;
 		this.miePlaylist = new ArrayList<>();
 	}
-	
-	
+		
 	public int getIdUtente() {
 		return idUtente;
 	}
@@ -57,18 +56,6 @@ public class Utente {
 		return password;
 	}
 	
-	public boolean modificaPassword(String oldPassword, String newPassword) {
-		if(this.getPassword().equals(oldPassword))
-		{
-			password = newPassword;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
 	public ArrayList <ElementoMultimediale> getElementiPubblicati(){
 		return this.elementiPubblicati;
 	}
@@ -77,35 +64,27 @@ public class Utente {
 		return this.miePlaylist;
 	}
 
-
 	public void setMatricola(String matricola) {
 		Matricola = matricola;
 	}
-
 
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
 
-
 	public void setCognome(String cognome) {
 		this.cognome = cognome;
 	}
-
 
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	
-	public void setIdUtente(int i) //metodo di test, da cancellare
-	{
-		idUtente = i;
-	}
+	
 	
 	
 	

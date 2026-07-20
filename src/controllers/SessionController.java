@@ -36,23 +36,21 @@ public class SessionController {
             
         	this.utenteLoggato = utenteTrovato;
             
-        	System.out.println("[DEBUG LOGIN] Utente loggato dal DB - Username: " 
-                    + utenteTrovato.getUsername() + " | ID reale su DB: " + utenteTrovato.getIdUtente());
             
             this.paginaLogin.dispose(); // Chiude il login
             
-            // Inizializza i controller di business passandogli la sessione
+            // Inizializza i controller passandogli la sessione
             MediaController mediaCtrl = new MediaController(this);
             PlaylistController playlistCtrl = new PlaylistController(this);
             
             
             ReportController reportCtrl = new ReportController(this); 
             
-            // Istanzia e mostra la HomePage vera e propria
+            // Istanzia e mostra la HomePage
             HomePage home = new HomePage(this, mediaCtrl, playlistCtrl, reportCtrl); 
             home.setVisible(true);
             
-            System.out.println("Login effettuato con successo per: " + utenteLoggato.getUsername());
+            
         } else {
             this.paginaLogin.mostraErrore("Credenziali errate! Riprova.");
         }

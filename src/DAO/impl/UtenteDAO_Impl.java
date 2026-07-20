@@ -68,7 +68,6 @@ public class UtenteDAO_Impl implements UtenteDao{
 		return null;
 	}
 
-	
 	@Override
 	public Utente trovaUtenteDaID(int ID) {
 		String query = "SELECT * FROM utenti WHERE id_utente = ?";
@@ -99,8 +98,6 @@ public class UtenteDAO_Impl implements UtenteDao{
 		}
 		return null;
 	}
-	
-	
 	
 	@Override
 	public boolean modificaUtente(Utente utente) {

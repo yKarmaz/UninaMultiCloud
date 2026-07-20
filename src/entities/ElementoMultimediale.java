@@ -1,6 +1,5 @@
 package entities;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -83,28 +82,34 @@ public class ElementoMultimediale {
 	public void setNumVisualizzazioni(int numVisualizzazioni) {
 		this.numVisualizzazioni = numVisualizzazioni;
 	}	
+	
 	public Utente getProprietario() {
 		return proprietario;
 	}
+	
 	public void setProprietario(Utente proprietario) {
 		this.proprietario = proprietario;
 	}
+	
 	public ArrayList<Utente> getListaFruitori() {
 		return listaFruitori;
 	}
+	
 	public void setListaFruitori(ArrayList<Utente> listaFruitori) {
 		this.listaFruitori = listaFruitori;
 	}
-
+	
 	public String visualizzaDettagli()
 	{
 		String stringaRitorno = "Titolo: " + titolo + "; Durata: " + durata + "; Data Creazione" + dataCreazione + "; Visualizzazioni: " + numVisualizzazioni + "; Copertina: "+ immagineCopertina + "; Descrizione: " + descrizione; 
 		return stringaRitorno;
 	}
+	
 	public void addFruitore(Utente u)
 	{
 		listaFruitori.add(u);
 	}
+	
 	public void removeFruitore(Utente u)
 	{
 		 listaFruitori.remove(u);

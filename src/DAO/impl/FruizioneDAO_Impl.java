@@ -5,10 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 import DAO.FruizioneDao;
-import entities.ElementoMultimediale;
 import entities.Fruizione;
 import entities.Utente;
 

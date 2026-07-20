@@ -60,13 +60,13 @@ public class PaginaFiltraggio extends JPanel {
         JButton btnApriElemento = new JButton("Apri Selezionato");
         add(btnApriElemento, BorderLayout.SOUTH);
 
-        // ==========================================
-        // EVENTI (QUI E' DOVE VA MESSO IL CODICE)
-        // ==========================================
+        
+        // EVENTI 
+        
         
         btnCerca.addActionListener(e -> eseguiRicerca(txtTitolo.getText().trim(), (String) comboTipo.getSelectedItem()));
 
-        // ECCO IL SALTO ALLA NUOVA VISTA DELLE PLAYLIST PUBBLICHE
+        // Salto alla vista di Playlist pubbliche
         btnPlaylistPubbliche.addActionListener(e -> {
             homePage.cambiaPannelloCentrale(new CatalogoPubbliche(playlistController, mediaController, homePage));
         });

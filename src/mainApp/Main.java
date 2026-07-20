@@ -1,17 +1,8 @@
 package mainApp;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import databaseConnection.DBConnection;
-import entities.*;
-import DAO.*;
-import DAO.impl.*;
-import controllers.*;
-import boundaries.*; 
+import controllers.*; 
 
 public class Main {
 
